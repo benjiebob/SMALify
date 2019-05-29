@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 checkpoints/
 *.pkl
+extra_videos/
