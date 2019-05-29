@@ -1,0 +1,3 @@
+[submodule "neural_renderer"]
+	path = neural_renderer
+	url = https://github.com/benjiebob/neural_renderer
