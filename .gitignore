@@ -105,3 +105,5 @@ venv.bak/
 checkpoints/
 *.pkl
 extra_videos/
+exported/
+safe/

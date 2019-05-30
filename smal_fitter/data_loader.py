@@ -45,7 +45,7 @@ def crop_to_silhouette(sil_img, rgb_img, joints, target_size):
     
     return sil_resize, rgb_resize, scaled_joints
 
-def load_badja_sequence(BADJA_PATH, sequence_name, crop_size, num_images = None):
+def load_badja_sequence(BADJA_PATH, sequence_name, crop_size, image_range = None):
     annotated_classes = SMALJointInfo().annotated_classes
 
     file_names = []
@@ -57,9 +57,9 @@ def load_badja_sequence(BADJA_PATH, sequence_name, crop_size, num_images = None)
     annotations_path = os.path.join(BADJA_PATH, "joint_annotations")
     json_path = os.path.join(annotations_path, "{0}.json".format(sequence_name))
     with open(json_path) as json_data:
-        sequence_annotation = json.load(json_data)
-        if num_images is not None:
-            sequence_annotation = sequence_annotation[:num_images]
+        sequence_annotation = np.array(json.load(json_data))
+        if image_range is not None:
+            sequence_annotation = sequence_annotation[image_range]
         for image_annotation in tqdm(sequence_annotation):
             file_name = os.path.join(BADJA_PATH, image_annotation['image_path'])
             seg_name = os.path.join(BADJA_PATH, image_annotation['segmentation_path'])
@@ -89,6 +89,6 @@ def load_badja_sequence(BADJA_PATH, sequence_name, crop_size, num_images = None)
     rgb = torch.FloatTensor(np.stack(rgb_imgs, axis = 0)).permute(0, 3, 1, 2)
     sil = torch.FloatTensor(np.stack(sil_imgs, axis = 0))[:, None, :, :]
     joints = torch.FloatTensor(np.stack(joints, axis = 0))
-    visibility = torch.FloatTensor(np.stack(visibility, axis = 0))
+    visibility = torch.FloatTensor(np.stack(visibility, axis = 0).astype(np.float))
 
     return (rgb, sil, joints, visibility), file_names

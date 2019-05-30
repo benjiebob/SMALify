@@ -11,31 +11,37 @@ import matplotlib.pyplot as plt
 import pickle as pkl
 
 class SMAL3DRenderer(nn.Module):
-    def __init__(self, image_size, z_distance = 2.0, elevation = 89.9, azimuth = 0.0):
+    # def __init__(self, image_size, n_betas, z_distance = 2.0, elevation = 89.9, azimuth = 0.0):
+    def __init__(self, image_size, n_betas, z_distance = 5.0, elevation = 89.9, azimuth = 0.0):
         super(SMAL3DRenderer, self).__init__()
         
         self.smal_model = SMALModel()
         self.image_size = image_size
         self.smal_info = SMALJointInfo()
+        self.n_betas = n_betas
 
         self.renderer = nr.Renderer(camera_mode='look_at')
         self.renderer.eye = nr.get_points_from_angles(z_distance, elevation, azimuth)
 
         self.renderer.image_size = image_size
         self.renderer.light_intensity_ambient = 1.0
-        # self.renderer.perspective = False
+        self.renderer.viewing_angle = 10
 
-        with open("../smal/dog_texture.pkl", 'rb') as f:
+        with open("smal/dog_texture.pkl", 'rb') as f:
             self.textures = pkl.load(f).cuda()
 
-    def forward(self, batch_params, return_visuals = False):
-        verts, joints_3d = self.smal_model(
-            batch_params['betas'], 
-            torch.cat((batch_params['global_rotation'], batch_params['joint_rotations']), dim = 1),
-            batch_params['trans'])
+    def forward(self, batch_params, return_visuals = False, reverse_view = False):
+        batch_size = batch_params['joint_rotations'].shape[0]
 
-        batch_size = batch_params['betas'].shape[0]
-        faces = self.smal_model.faces[None, :, :].expand(batch_size, -1, -1)
+        if reverse_view:
+            batch_params['global_rotation'] += torch.FloatTensor([[0, 0, 3 * np.pi / 2]]).cuda()
+
+        verts, joints_3d = self.smal_model(
+            torch.cat([batch_params['betas'], torch.zeros(batch_size, 41 - self.n_betas).cuda()], dim = 1), # Pad remaining shape parameters with zero,
+            torch.cat((batch_params['global_rotation'], batch_params['joint_rotations'].view(batch_size, -1)), dim = 1),
+            batch_params['trans'], normalize = reverse_view)
+    
+        faces = self.smal_model.faces.unsqueeze(0).expand(batch_size, -1, -1)
         textures = self.textures.unsqueeze(0).expand(batch_size, -1, -1, -1, -1, -1)
 
         rendered_joints = self.renderer.render_points(joints_3d[:, self.smal_info.annotated_classes])

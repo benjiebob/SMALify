@@ -1,7 +1,4 @@
 
-import sys
-sys.path.append('../')
-
 from smal.smal3d_renderer import SMAL3DRenderer
 from smal.draw_smal_joints import SMALJointDrawer
 
@@ -19,13 +16,11 @@ import torch.nn as nn
 from functools import reduce
 
 from joint_limits_prior import LimitPrior
-from torchvision.utils import make_grid
-import trimesh
 
-SMAL_DATA_PATH = '../smal/smal_CVPR2017_data.pkl'
+SMAL_DATA_PATH = 'smal/smal_CVPR2017_data.pkl'
 
 class SMALFitter(nn.Module):
-    def __init__(self, data_batch, filename_batch, batch_size, shape_family, output_dir, n_betas = 20):
+    def __init__(self, data_batch, batch_size, shape_family, n_betas = 20):
         super(SMALFitter, self).__init__()
 
         self.rgb_imgs, self.sil_imgs, self.target_joints, self.target_visibility = data_batch
@@ -33,14 +28,9 @@ class SMALFitter(nn.Module):
 
         assert self.rgb_imgs.max() <= 1.0 and self.rgb_imgs.min() >= 0.0, "RGB Image range is incorrect"
 
-        self.output_dirs = [] 
-        for filename in filename_batch:
-            filename_path = os.path.join(output_dir, os.path.splitext(filename)[0])
-            self.output_dirs.append(filename_path)
-            os.mkdir(filename_path)
-
         self.num_images = self.rgb_imgs.shape[0]
         self.batch_size = batch_size
+        self.n_betas = n_betas
 
         self.shape_family_list = np.array(shape_family)
         with open(SMAL_DATA_PATH, 'rb') as f:
@@ -53,20 +43,24 @@ class SMALFitter(nn.Module):
         invcov = np.linalg.inv(model_covs + 1e-5 * np.eye(model_covs.shape[0]))
         prec = np.linalg.cholesky(invcov)
 
-        self.betas_prec = torch.FloatTensor(prec).cuda()
-        self.mean_betas = torch.FloatTensor(smal_data['cluster_means'][shape_family][0]).cuda()
+        self.betas_prec = torch.FloatTensor(prec)[:n_betas, :n_betas].cuda()
+        self.mean_betas = torch.FloatTensor(smal_data['cluster_means'][shape_family][0])[:n_betas].cuda()
+        self.betas = nn.Parameter(self.mean_betas.clone().unsqueeze(0)) # Shape parameters (1 for the entire sequence... note expand rather than repeat)
+        
+        # self.betas.register_hook(self.print_grads)
 
         self.smal_joint_drawer = SMALJointDrawer()
 
         limit_prior = LimitPrior()
-        self.max_limits = torch.FloatTensor(limit_prior.max_values).cuda()
-        self.min_limits = torch.FloatTensor(limit_prior.min_values).cuda()
+        self.max_limits = torch.FloatTensor(limit_prior.max_values).view(32, 3).cuda()
+        self.min_limits = torch.FloatTensor(limit_prior.min_values).view(32, 3).cuda()
         
-        global_rotation = torch.FloatTensor([0, 0, np.pi / 2])[None, :].cuda().repeat(self.num_images, 1) # Global Init
+        global_rotation = torch.FloatTensor([0, 0, 3 * np.pi / 2])[None, :].cuda().repeat(self.num_images, 1) # Global Init (Head-On)
         self.global_rotation = nn.Parameter(global_rotation)
 
-        self.global_mask = torch.ones_like(global_rotation)
-        # self.global_mask[:, :2] = 0.0
+        # Use this to restrict global rotation if necessary
+        self.global_mask = torch.ones(1, 3).cuda()
+        # self.global_mask[:2] = 0.0 
 
         trans = torch.FloatTensor([0.0, 0.0, 0.0])[None, :].cuda().repeat(self.num_images, 1) # Trans Init
         self.trans = nn.Parameter(trans)
@@ -74,39 +68,34 @@ class SMALFitter(nn.Module):
         default_joints = torch.zeros(self.num_images, 32, 3).cuda()
         self.joint_rotations = nn.Parameter(default_joints)
 
-        self.rotation_mask = torch.ones_like(default_joints)
-        self.rotation_mask[:, 25:32] = 0.0
-        self.rotation_mask[:, :, [0, 2]] = 0.0
+        # This is a very simple prior over joint rotations, preventing 'splaying' and 'twisting' motions.
+        self.rotation_mask = torch.ones(32, 3).cuda()
+        self.rotation_mask[25:32] = 0.0
       
-        self.betas = nn.Parameter(self.mean_betas[:n_betas][None, :].clone())
-
         # setup renderers
-        self.model_renderer = SMAL3DRenderer(256).cuda()
-        self.alt_view_renderer = SMAL3DRenderer(256, elevation=89.9).cuda()
+        self.model_renderer = SMAL3DRenderer(256, n_betas).cuda()
+        self.faces = self.model_renderer.smal_model.faces.cpu().data.numpy()
 
     def print_grads(self, grad_output):
         print (grad_output)
 
-    def forward(self, batch_range, weights):
-        w_j2d, w_reproj, w_betas, w_limit = weights
-
-        betas = torch.cat([self.betas, torch.zeros(1, 21).cuda()], dim = 1).expand(self.num_images, 41)      
-        joint_rotations = (self.joint_rotations * self.rotation_mask).view(self.num_images, -1)
-        global_rotation = self.global_rotation * self.global_mask
-
+    def forward(self, batch_range, weights, stage_id):
+        w_j2d, w_reproj, w_betas, w_limit, w_splay = weights
+        
         batch_params = {
-            'global_rotation' : global_rotation[batch_range],
+            'global_rotation' : self.global_rotation[batch_range] * self.global_mask,
+            'joint_rotations' : self.joint_rotations[batch_range] * self.rotation_mask,
+            'betas' : self.betas.expand(len(batch_range), self.n_betas),
             'trans' : self.trans[batch_range],
-            'betas' : betas[batch_range],
-            'joint_rotations' : joint_rotations[batch_range],
         }
 
         target_joints = self.target_joints[batch_range].cuda()
         target_visibility = self.target_visibility[batch_range].cuda()
         sil_imgs = self.sil_imgs[batch_range].cuda()
     
-        objs = {}
         rendered_silhouettes, rendered_joints, _ = self.model_renderer(batch_params)
+
+        objs = {}
 
         if w_j2d > 0:
             rendered_joints[~target_visibility.byte()] = -1.0
@@ -119,9 +108,12 @@ class SMALFitter(nn.Module):
             objs['limit'] = w_limit * torch.mean(
                 torch.max(batch_params['joint_rotations'] - self.max_limits, zeros) + \
                 torch.max(self.min_limits - batch_params['joint_rotations'], zeros))
+
+        if w_splay > 0:
+            objs['splay'] = w_splay * torch.sum(batch_params['joint_rotations'][:, :, [0, 2]] ** 2)
         
         if w_betas > 0:
-            beta_error = torch.tensordot(batch_params['betas'][:, :20] - self.mean_betas[:20], self.betas_prec[:20, :20], dims = 1)
+            beta_error = torch.tensordot(batch_params['betas'] - self.mean_betas, self.betas_prec, dims = 1)
             objs['betas'] = w_betas * torch.mean(beta_error ** 2)
     
         if w_reproj > 0:
@@ -130,7 +122,7 @@ class SMALFitter(nn.Module):
         return reduce(lambda x, y: x + y, objs.values()), objs
 
     def get_temporal(self, w_temp):
-        joint_rotations = (self.joint_rotations * self.rotation_mask).view(self.num_images, -1)
+        joint_rotations = self.joint_rotations * self.rotation_mask
         global_rotation = self.global_rotation * self.global_mask
 
         joint_loss = 0
@@ -144,20 +136,31 @@ class SMALFitter(nn.Module):
 
         return joint_loss, global_loss, trans_loss
 
-    def generate_visualization(self, stage, epoch):
-        betas = torch.cat([self.betas, torch.zeros(1, 21).cuda()], dim = 1).expand(self.num_images, 41)
-        joint_rotations = (self.joint_rotations * self.rotation_mask).view(self.num_images, -1)
-        joint_rotations = self.joint_rotations.view(self.num_images, -1)
+    def load_checkpoint(self, checkpoint_path, epoch):
+        beta_list = []
+        for frame_id in range(self.num_images):
+            param_file = os.path.join(checkpoint_path, "{0:04}".format(frame_id), "{0}.pkl".format(epoch))
+            with open(param_file, 'rb') as f:
+                img_parameters = pkl.load(f)
+                self.global_rotation[frame_id] = torch.from_numpy(img_parameters['global_rotation']).float().cuda()
+                self.joint_rotations[frame_id] = torch.from_numpy(img_parameters['joint_rotations']).float().cuda().view(32, 3)
+                self.trans[frame_id] = torch.from_numpy(img_parameters['trans']).float().cuda()
+                beta_list.append(img_parameters['betas'][:self.n_betas])
 
-        global_rotation = self.global_rotation * self.global_mask
+        self.global_rotation = torch.nn.Parameter(self.global_rotation)
+        self.joint_rotations = torch.nn.Parameter(self.joint_rotations)
+        self.trans = torch.nn.Parameter(self.trans)
+        betas = torch.from_numpy(np.mean(beta_list, axis = 0)).float().cuda()
+        self.betas = torch.nn.Parameter(betas)
 
+    def generate_visualization(self, image_exporter):
         for j in range(0, self.num_images, self.batch_size):
             batch_range = list(range(j, min(self.num_images, j + self.batch_size)))
             batch_params = {
-                'global_rotation' : global_rotation[batch_range],
+                'global_rotation' : self.global_rotation[batch_range] * self.global_mask,
+                'joint_rotations' : self.joint_rotations[batch_range] * self.rotation_mask,
+                'betas' : self.betas.expand(len(batch_range), self.n_betas),
                 'trans' : self.trans[batch_range],
-                'betas' : betas[batch_range],
-                'joint_rotations' : joint_rotations[batch_range],
             }
 
             target_joints = self.target_joints[batch_range]
@@ -167,7 +170,7 @@ class SMALFitter(nn.Module):
 
             with torch.no_grad():
                 rendered_images, rendered_silhouettes, rendered_joints, _, verts, _ = self.model_renderer(batch_params, return_visuals = True)
-                rev_images, rev_silhouettes, rev_joints, rev_valid, _, _ = self.alt_view_renderer(batch_params, return_visuals = True)
+                rev_images, _, rev_joints, _, _, _ = self.model_renderer(batch_params, return_visuals = True, reverse_view = True)
 
                 target_vis = self.smal_joint_drawer.draw_joints(rgb_imgs, target_joints, visible = target_visibility, normalized=False)
                 rendered_images_vis = self.smal_joint_drawer.draw_joints(rendered_images, rendered_joints, visible = target_visibility, normalized=False)
@@ -178,27 +181,9 @@ class SMALFitter(nn.Module):
 
                 collage_rows = torch.cat([target_vis, rendered_images_vis, silhouette_error, rev_images_vis], dim = 3)
 
-                # collage = make_grid(target_vis, nrow = 2, padding = 10, pad_value=1.0)
-
-                # plt.suptitle("Stage: {0}, Ep: {1}".format(stage, epoch))
-                # plt.imshow(np.transpose(collage.numpy(), (1, 2, 0)))
-                # plt.draw()
-                # plt.pause(0.01)
-
-                for i, im_id in enumerate(batch_range):
-                    collage_np = np.transpose(collage_rows[i].numpy(), (1, 2, 0))
-                    scipy.misc.imsave(os.path.join(self.output_dirs[im_id], "st{0}_ep{1}.png".format(stage, epoch)), collage_np)
-
-                    # Export parameters
-                    img_parameters = { k: v[i].cpu().data.numpy() for (k, v) in batch_params.items() }
-                    with open(os.path.join(self.output_dirs[im_id], "st{0}_ep{1}.pkl".format(stage, epoch)), 'wb') as f:
-                        pkl.dump(img_parameters, f)
-                
-                    # Export mesh
-                    vertices = verts[i].cpu().numpy()
-                    vertices[:, 0] *= -1
-                    mesh = trimesh.Trimesh(vertices = vertices, faces = self.model_renderer.smal_model.faces.cpu().data.numpy(), process = False)
-                    mesh.export(os.path.join(self.output_dirs[im_id], "st{0}_ep{1}.ply".format(stage, epoch)))
+                for batch_id, global_id in enumerate(batch_range):
+                    collage_np = np.transpose(collage_rows[batch_id].numpy(), (1, 2, 0))
+                    image_exporter.export(collage_np, batch_id, global_id, batch_params, verts, self.faces)
             
             
 
