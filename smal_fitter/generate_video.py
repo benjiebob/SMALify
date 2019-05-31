@@ -1,3 +1,7 @@
+
+import sys, os
+sys.path.append(os.path.dirname(sys.path[0]))
+
 import numpy as np
 import cv2
 import argparse
@@ -6,39 +10,32 @@ import matplotlib.pyplot as plt
 from smal_fitter import SMALFitter
 
 import torch
-import scipy.misc
+import imageio
 
 from data_loader import load_badja_sequence
+import time
 
-import os, time
-import sys
-
-OPT_WEIGHTS = np.array([
-    [25.0, 10.0, 7.5, 5.0], # Joint
-    [0.0, 0.0, 100.0, 100.0], # Sil Reproj
-    [0.0, 0.1, 1.0, 0.1], # Betas
-    [0.0, 50.0, 100.0, 100.0], # Limits
-    [500.0, 100.0, 100.0, 100.0], # Temporal
-    [150, 500, 500, 500], # Num iterations
-    [1e-1, 2.5e-3, 5e-3, 5e-3]]) # Learning Rate
-
-IM_FREQ = 100
-
+import pickle as pkl
 
 class ImageExporter():
     def __init__(self, output_dir):
         self.output_dir = output_dir
 
-    def export(self, collage_np, batch_id, global_id, batch_params, vertices, faces):
-        scipy.misc.imsave(os.path.join(self.output_dir, "{0:04}.png".format(global_id)), collage_np)
+    def export(self, collage_np, batch_id, global_id, img_parameters, vertices, faces):
+        imageio.imsave(os.path.join(self.output_dir, "{0:04}.png".format(global_id)), collage_np)
+
+        with open(os.path.join(self.output_dir, "{0:04}.pkl".format(global_id)), 'wb') as f:
+            pkl.dump(img_parameters, f)
 
 def main():
     BADJA_PATH = "smal_fitter/BADJA"
     SHAPE_FAMILY = [1]
-    CHECKPOINT_NAME = "20190529-210223"
-    EPOCH_NAME = "st5_ep0"
+    CHECKPOINT_NAME = "20190530-202439"
+    # CHECKPOINT_NAME = "20190531-174847"
+    EPOCH_NAME = "st10_ep0"
+    # EPOCH_NAME = "st0_ep10"
     OUTPUT_DIR = os.path.join("smal_fitter", "exported", CHECKPOINT_NAME, EPOCH_NAME)
-    WINDOW_SIZE = 25
+    WINDOW_SIZE = 5
     CROP_SIZE = 256
     GPU_IDS = "0"
 

@@ -138,20 +138,17 @@ class SMALFitter(nn.Module):
 
     def load_checkpoint(self, checkpoint_path, epoch):
         beta_list = []
+       
         for frame_id in range(self.num_images):
             param_file = os.path.join(checkpoint_path, "{0:04}".format(frame_id), "{0}.pkl".format(epoch))
             with open(param_file, 'rb') as f:
                 img_parameters = pkl.load(f)
-                self.global_rotation[frame_id] = torch.from_numpy(img_parameters['global_rotation']).float().cuda()
+                self.global_rotation[frame_id] = torch.from_numpy(img_parameters['global_rotation']).float().cuda() - torch.FloatTensor([[0, 0, 3 * np.pi / 2]]).cuda() # Temporary hack
                 self.joint_rotations[frame_id] = torch.from_numpy(img_parameters['joint_rotations']).float().cuda().view(32, 3)
                 self.trans[frame_id] = torch.from_numpy(img_parameters['trans']).float().cuda()
                 beta_list.append(img_parameters['betas'][:self.n_betas])
 
-        self.global_rotation = torch.nn.Parameter(self.global_rotation)
-        self.joint_rotations = torch.nn.Parameter(self.joint_rotations)
-        self.trans = torch.nn.Parameter(self.trans)
-        betas = torch.from_numpy(np.mean(beta_list, axis = 0)).float().cuda()
-        self.betas = torch.nn.Parameter(betas)
+        self.betas = torch.nn.Parameter(torch.from_numpy(np.mean(beta_list, axis = 0)).float().cuda())
 
     def generate_visualization(self, image_exporter):
         for j in range(0, self.num_images, self.batch_size):
@@ -170,7 +167,7 @@ class SMALFitter(nn.Module):
 
             with torch.no_grad():
                 rendered_images, rendered_silhouettes, rendered_joints, _, verts, _ = self.model_renderer(batch_params, return_visuals = True)
-                rev_images, _, rev_joints, _, _, _ = self.model_renderer(batch_params, return_visuals = True, reverse_view = True)
+                rev_images, _, rev_joints, _, _, _ = self.model_renderer(batch_params, return_visuals = True, reverse_view = True, crop_to_silhouette = True)
 
                 target_vis = self.smal_joint_drawer.draw_joints(rgb_imgs, target_joints, visible = target_visibility, normalized=False)
                 rendered_images_vis = self.smal_joint_drawer.draw_joints(rendered_images, rendered_joints, visible = target_visibility, normalized=False)
@@ -183,7 +180,8 @@ class SMALFitter(nn.Module):
 
                 for batch_id, global_id in enumerate(batch_range):
                     collage_np = np.transpose(collage_rows[batch_id].numpy(), (1, 2, 0))
-                    image_exporter.export(collage_np, batch_id, global_id, batch_params, verts, self.faces)
+                    img_parameters = { k: v[batch_id].cpu().data.numpy() for (k, v) in batch_params.items() }
+                    image_exporter.export(collage_np, batch_id, global_id, img_parameters, verts, self.faces)
             
             
 

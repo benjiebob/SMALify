@@ -1,3 +1,7 @@
+
+import sys, os
+sys.path.append(os.path.dirname(sys.path[0]))
+
 import numpy as np
 import cv2
 import argparse
@@ -7,7 +11,7 @@ from smal_fitter import SMALFitter
 import pickle as pkl
 
 import torch
-import scipy.misc
+import imageio
 
 from data_loader import load_badja_sequence
 import trimesh
@@ -18,7 +22,6 @@ import sys
 OPT_WEIGHTS = np.array([
     [25.0, 10.0, 7.5, 5.0], # Joint
     [0.0, 0.0, 100.0, 100.0], # Sil Reproj
-    # [0.0, 0.1, 1.0, 0.1], # Betas
     [0.0, 0.0, 0.0, 0.0], # Betas
     [0.0, 100.0, 100.0, 100.0], # Limits
     [0.0, 100.0, 100.0, 100.0], # Splay
@@ -44,17 +47,15 @@ class ImageExporter():
         
         return output_dirs
 
-    def export(self, collage_np, batch_id, global_id, batch_params, vertices, faces):
-        scipy.misc.imsave(os.path.join(self.output_dirs[global_id], "st{0}_ep{1}.png".format(self.stage_id, self.epoch_name)), collage_np)
+    def export(self, collage_np, batch_id, global_id, img_parameters, vertices, faces):
+        imageio.imsave(os.path.join(self.output_dirs[global_id], "st{0}_ep{1}.png".format(self.stage_id, self.epoch_name)), collage_np)
 
         # Export parameters
-        img_parameters = { k: v[batch_id].cpu().data.numpy() for (k, v) in batch_params.items() }
         with open(os.path.join(self.output_dirs[global_id], "st{0}_ep{1}.pkl".format(self.stage_id, self.epoch_name)), 'wb') as f:
             pkl.dump(img_parameters, f)
 
         # Export mesh
         vertices = vertices[batch_id].cpu().numpy()
-        vertices[:, 0] *= -1
         mesh = trimesh.Trimesh(vertices = vertices, faces = faces, process = False)
         mesh.export(os.path.join(self.output_dirs[global_id], "st{0}_ep{1}.ply".format(self.stage_id, self.epoch_name)))
 
@@ -65,15 +66,17 @@ def main():
     SHAPE_FAMILY = [1]
     WINDOW_SIZE = 25
     CROP_SIZE = 256
-    GPU_IDS = "1"
+    GPU_IDS = "0"
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
 
     # image_range = range(170, 174) # Reversed
     # image_range = range(145, 155) # Twist
+    image_range = range(0, 4) # Run
+    # image_range = None
 
-    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE)
+    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE, image_range=image_range)
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
 
