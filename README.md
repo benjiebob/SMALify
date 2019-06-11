@@ -8,9 +8,7 @@ Animal fitting code for the paper Creatures Great and SMAL.
 
 <img src="docs/output.gif">
 
-# Foot Fitter
+# Installation
 Blah blah
 
-# Foot Viewer
-
-# Annotator
+# Acknowledegements
