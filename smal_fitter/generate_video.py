@@ -12,7 +12,7 @@ from smal_fitter import SMALFitter
 import torch
 import imageio
 
-from data_loader import load_badja_sequence
+from data_loader import load_badja_sequence, load_data_from_npz
 import time
 
 import pickle as pkl
@@ -30,7 +30,7 @@ class ImageExporter():
 def main():
     BADJA_PATH = "smal_fitter/BADJA"
     SHAPE_FAMILY = [1]
-    CHECKPOINT_NAME = "20190530-202439"
+    CHECKPOINT_NAME = "cosker-maggie"
     # CHECKPOINT_NAME = "20190531-174847"
     EPOCH_NAME = "st10_ep0"
     # EPOCH_NAME = "st0_ep10"
@@ -39,12 +39,18 @@ def main():
     CROP_SIZE = 256
     GPU_IDS = "0"
 
+    INPUT_PATH = "/data/cvfs/bjb56/data/smal_data/smal_joints/hg/24_04/prediction/"
+    CLEANED_NAME = "20190522-140530_rocky_rl6_pop256" 
+
+
     image_exporter = ImageExporter(OUTPUT_DIR)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
 
-    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE)
+    # data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE)
+    data, filenames = load_data_from_npz(os.path.join(INPUT_PATH, CHECKPOINT_NAME, "cleaned_skeleton", CLEANED_NAME))
+
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
 

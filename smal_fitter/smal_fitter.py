@@ -55,7 +55,7 @@ class SMALFitter(nn.Module):
         self.max_limits = torch.FloatTensor(limit_prior.max_values).view(32, 3).cuda()
         self.min_limits = torch.FloatTensor(limit_prior.min_values).view(32, 3).cuda()
         
-        global_rotation = torch.FloatTensor([0, 0, 3 * np.pi / 2])[None, :].cuda().repeat(self.num_images, 1) # Global Init (Head-On)
+        global_rotation = torch.FloatTensor([0, 0, np.pi / 2])[None, :].cuda().repeat(self.num_images, 1) # Global Init (Head-On)
         self.global_rotation = nn.Parameter(global_rotation)
 
         # Use this to restrict global rotation if necessary
@@ -143,7 +143,7 @@ class SMALFitter(nn.Module):
             param_file = os.path.join(checkpoint_path, "{0:04}".format(frame_id), "{0}.pkl".format(epoch))
             with open(param_file, 'rb') as f:
                 img_parameters = pkl.load(f)
-                self.global_rotation[frame_id] = torch.from_numpy(img_parameters['global_rotation']).float().cuda() - torch.FloatTensor([[0, 0, 3 * np.pi / 2]]).cuda() # Temporary hack
+                self.global_rotation[frame_id] = torch.from_numpy(img_parameters['global_rotation']).float().cuda()
                 self.joint_rotations[frame_id] = torch.from_numpy(img_parameters['joint_rotations']).float().cuda().view(32, 3)
                 self.trans[frame_id] = torch.from_numpy(img_parameters['trans']).float().cuda()
                 beta_list.append(img_parameters['betas'][:self.n_betas])
