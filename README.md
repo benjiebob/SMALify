@@ -2,7 +2,7 @@ PUBLIC REPOSITORY IS A WORK IN PROGRESS. I am due to add installation instructio
 
 # Creatures Great and SMAL
 
-Animal fitting code for the paper [Creatures Great and SMAL: Recovering the shape and motion of animals from video](https://arxiv.org/abs/1811.05804). If you use this dataset, please consider citing this work:
+Animal fitting code for the paper [Creatures Great and SMAL: Recovering the shape and motion of animals from video](https://arxiv.org/abs/1811.05804). If you make use of this code, please consider citing:
 
 ```
 @inproceedings{biggs2018creatures,
