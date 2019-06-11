@@ -16,4 +16,7 @@ Animal fitting code for the paper [Creatures Great and SMAL: Recovering the shap
 <img src="docs/output.gif">
 
 # Installation
-Blah blah
+TODO
+
+## Contribute
+Please create a pull request or submit an issue if you would like to contribute.
