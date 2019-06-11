@@ -1,14 +1,22 @@
+PUBLIC REPOSITORY IS A WORK IN PROGRESS. I am due to add installation instructions and simplify code... for now, enjoy at your own risk :)
+
 # Creatures Great and SMAL
 
-Animal fitting code for the paper Creatures Great and SMAL.
+Animal fitting code for the paper [Creatures Great and SMAL: Recovering the shape and motion of animals from video](https://arxiv.org/abs/1811.05804). If you make use of this code, please consider citing:
 
-1) foot_fitter: Model fitting optimizer for fitting Trya Foot Model to silhouette images.
-2) foot_viewer: PyQt5 app for viewing shape deformations modes of Trya Foot Model 
-3) annotator: Tool used for labelling key points on input images
+```
+@inproceedings{biggs2018creatures,
+  title={{C}reatures great and {SMAL}: {R}ecovering the shape and motion of animals from video},
+  author={Biggs, Benjamin and Roddick, Thomas and Fitzgibbon, Andrew and Cipolla, Roberto},
+  booktitle={ACCV},
+  year={2018}
+}
+````
 
 <img src="docs/output.gif">
 
-# Installation
-Blah blah
+## Installation
+TODO
 
-# Acknowledegements
+## Contribute
+Please create a pull request or submit an issue if you would like to contribute.
