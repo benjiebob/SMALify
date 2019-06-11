@@ -1,4 +1,4 @@
-PUBLIC REPOSITORY IS A WORK IN PROGRESS.
+PUBLIC REPOSITORY IS A WORK IN PROGRESS. I am due to add installation instructions and simplify code... for now, enjoy at your own risk :)
 
 # Creatures Great and SMAL
 
