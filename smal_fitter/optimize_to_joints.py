@@ -13,7 +13,7 @@ import pickle as pkl
 import torch
 import imageio
 
-from data_loader import load_badja_sequence, load_data_from_npz
+from data_loader import load_badja_sequence
 import trimesh
 
 import os, time

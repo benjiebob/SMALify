@@ -24,7 +24,9 @@ class SMAL3DRenderer(nn.Module):
 
         self.renderer.image_size = image_size
         self.renderer.light_intensity_ambient = 1.0
+        self.renderer.light_direction = [0.0, 0.0, -1.0]
         self.renderer.viewing_angle = 10
+        self.renderer.background_color = [1.0, 1.0, 1.0]
 
         with open("smal/dog_texture.pkl", 'rb') as f:
             self.textures = pkl.load(f).cuda()
@@ -70,8 +72,8 @@ class SMAL3DRenderer(nn.Module):
         crop_boxes[:, :, :, 0] = (2.0 * crop_boxes[:, :, :, 0] / images.shape[2]) - 1.0
         crop_boxes[:, :, :, 1] = (2.0 * crop_boxes[:, :, :, 1] / images.shape[3]) - 1.0
         crop_boxes = torch.flip(crop_boxes, [3])
-
-        cropped_images = F.grid_sample(images, crop_boxes)
+        
+        cropped_images = F.grid_sample(images - 1.0, crop_boxes) + 1.0
         cropped_silhouettes = F.grid_sample(silhouettes[:, None, :, :], crop_boxes)[:, 0]
 
         scale_factor = torch.FloatTensor([images.shape[2], images.shape[3]]).cuda() / new_squaresize
@@ -85,8 +87,6 @@ class SMAL3DRenderer(nn.Module):
 
         if reverse_view:
             global_rotation += torch.FloatTensor([[0, 0, 3 * np.pi / 2]]).cuda()
-            # global_rotation += torch.FloatTensor([[0, 0, np.pi]]).cuda()
-            # global_rotation = torch.ones_like(global_rotation) * torch.FloatTensor([[0, 0, np.pi / 4]]).cuda()
 
         verts, joints_3d = self.smal_model(
             torch.cat([batch_params['betas'], torch.zeros(batch_size, 41 - self.n_betas).cuda()], dim = 1), # Pad remaining shape parameters with zeros

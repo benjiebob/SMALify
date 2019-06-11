@@ -12,7 +12,7 @@ from smal_fitter import SMALFitter
 import torch
 import imageio
 
-from data_loader import load_badja_sequence, load_data_from_npz
+from data_loader import load_badja_sequence
 import time
 
 import pickle as pkl
@@ -33,7 +33,7 @@ def main():
 
     CHECKPOINT_NAME = "20190531-174847"
     EPOCH_NAME = "st10_ep0"
-    # EPOCH_NAME = "st0_ep10"
+    
     OUTPUT_DIR = os.path.join("smal_fitter", "exported", CHECKPOINT_NAME, EPOCH_NAME)
     WINDOW_SIZE = 5
     CROP_SIZE = 256

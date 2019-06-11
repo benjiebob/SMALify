@@ -173,7 +173,7 @@ class SMALFitter(nn.Module):
                 rendered_images_vis = self.smal_joint_drawer.draw_joints(rendered_images, rendered_joints, visible = target_visibility, normalized=False)
                 rev_images_vis = self.smal_joint_drawer.draw_joints(rev_images, rev_joints, visible = target_visibility, normalized=False)
 
-                silhouette_error = F.l1_loss(sil_imgs, rendered_silhouettes, reduction='none')
+                silhouette_error = 1.0 - F.l1_loss(sil_imgs, rendered_silhouettes, reduction='none')
                 silhouette_error = silhouette_error.expand_as(rgb_imgs).data.cpu()
 
                 collage_rows = torch.cat([target_vis, rendered_images_vis, silhouette_error, rev_images_vis], dim = 3)

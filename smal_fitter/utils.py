@@ -7,7 +7,7 @@ def crop_to_silhouette(sil_img, rgb_img, joints, target_size):
 
     sil_h, sil_w = sil_img.shape
     pad_sil = np.zeros((sil_h * 4, sil_w * 4))
-    pad_rgb = np.zeros((sil_h * 4, sil_w * 4, 3))
+    pad_rgb = np.ones((sil_h * 4, sil_w * 4, 3))
 
     pad_sil[sil_h * 2 : sil_h * 3, sil_w * 2 : sil_w * 3] = sil_img
     pad_rgb[sil_h * 2 : sil_h * 3, sil_w * 2 : sil_w * 3, :] = rgb_img
