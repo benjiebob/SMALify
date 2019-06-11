@@ -11,6 +11,7 @@ Animal fitting code for the paper [Creatures Great and SMAL: Recovering the shap
   booktitle={ACCV},
   year={2018}
 }
+````
 
 <img src="docs/output.gif">
 
