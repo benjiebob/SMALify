@@ -13,36 +13,6 @@ import json
 
 from smal.joint_catalog import SMALJointInfo
 
-def load_data_from_npz(input_folder):
-    smal_info = SMALJointInfo()
-    # include_classes = [0, 2, 5, 11, 12, 13, 7, 8, 9, 14, 15, 21, 22, 23, 17, 18, 19, 24, 27, 30, 31, 32, 35, 34, 33] # Flip Front and Back
-    include_classes = [0, 2, 5, 11, 12, 13, 7, 8, 9, 14, 15, 21, 22, 23, 17, 18, 19, 24, 27, 30, 31, 32, 35] # Flip Front and Back
-    input_files = list(filter(lambda x: os.path.splitext(x)[1] == ".npz", sorted(os.listdir(input_folder))))
-
-    rgb_imgs = []
-    sil_imgs = []
-    target_joints = []
-    target_visibility = []
-    for fn in input_files:
-        npz_file = os.path.join(input_folder, fn)
-        data = np.load(npz_file)
-        rgb_imgs.append(data['rgb_img'] / 255.0)
-        sil_imgs.append(data['target_img'])
-        target_joints.append(data['joint_coords'][include_classes][:, ::-1])
-        visibility = np.invert(data['null_joints'][include_classes]).astype(float)
-        
-        visibility[np.all(np.where(target_joints) == [0.0, 0.0])] == 0.0
-        visibility[-2:] = 0.0
-
-        target_visibility.append(visibility)
-
-    rgb = torch.FloatTensor(np.stack(rgb_imgs, axis = 0)).permute(0, 3, 1, 2)
-    sil = torch.FloatTensor(np.stack(sil_imgs, axis = 0))[:, None, :, :]
-    joints = torch.FloatTensor(np.stack(target_joints, axis = 0))
-    target_visibility = torch.FloatTensor(np.stack(target_visibility, axis = 0).astype(np.float))
-
-    return (rgb, sil, joints, target_visibility), input_files
-
 def load_badja_sequence(BADJA_PATH, sequence_name, crop_size, image_range = None):
     annotated_classes = SMALJointInfo().annotated_classes
 

@@ -65,9 +65,6 @@ def main():
 
     OUTPUT_DIR = "smal_fitter/checkpoints/{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 
-    INPUT_NAME = "cosker-maggie"
-    CLEANED_NAME = "20190522-140530_rocky_rl6_pop256" 
-
     SHAPE_FAMILY = [1]
     WINDOW_SIZE = 100
     CROP_SIZE = 256
@@ -76,13 +73,7 @@ def main():
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
 
-    # image_range = range(170, 174) # Reversed
-    # image_range = range(145, 155) # Twist
-    image_range = range(0, 4) # Run
-    # image_range = None
-
-    # data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE, image_range=image_range)
-    data, filenames = load_data_from_npz(os.path.join(INPUT_PATH, INPUT_NAME, "cleaned_skeleton", CLEANED_NAME))
+    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE)
 
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
