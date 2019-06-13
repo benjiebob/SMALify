@@ -1,4 +1,8 @@
 
+####
+### ffmpeg -framerate 50 -i %04d.png -pix_fmt yuv420p rs_dog.gif
+###
+
 import sys, os
 sys.path.append(os.path.dirname(sys.path[0]))
 
@@ -31,9 +35,9 @@ def main():
     BADJA_PATH = "smal_fitter/BADJA"
     SHAPE_FAMILY = [1]
 
-    CHECKPOINT_NAME = "20190531-174847"
+    CHECKPOINT_NAME = "rs_dog"
     EPOCH_NAME = "st10_ep0"
-    
+
     OUTPUT_DIR = os.path.join("smal_fitter", "exported", CHECKPOINT_NAME, EPOCH_NAME)
     WINDOW_SIZE = 5
     CROP_SIZE = 256
