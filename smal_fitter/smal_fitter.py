@@ -55,7 +55,7 @@ class SMALFitter(nn.Module):
         self.max_limits = torch.FloatTensor(limit_prior.max_values).view(32, 3).cuda()
         self.min_limits = torch.FloatTensor(limit_prior.min_values).view(32, 3).cuda()
         
-        global_rotation = torch.FloatTensor([0, 0, np.pi / 2])[None, :].cuda().repeat(self.num_images, 1) # Global Init (Head-On)
+        global_rotation = torch.FloatTensor([0, 0, 3 * np.pi / 2])[None, :].cuda().repeat(self.num_images, 1) # Global Init (Head-On)
         self.global_rotation = nn.Parameter(global_rotation)
 
         # Use this to restrict global rotation if necessary
@@ -71,6 +71,10 @@ class SMALFitter(nn.Module):
         # This is a very simple prior over joint rotations, preventing 'splaying' and 'twisting' motions.
         self.rotation_mask = torch.ones(32, 3).cuda()
         self.rotation_mask[25:32] = 0.0
+
+        self.rotation_mask[:, [0, 2]] = 0.0
+        self.rotation_mask[:7, [0, 2]] = 1.0
+        self.rotation_mask[[15, 16], [0, 2]] = 1.0
       
         # setup renderers
         self.model_renderer = SMAL3DRenderer(256, n_betas).cuda()
