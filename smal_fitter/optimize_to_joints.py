@@ -22,9 +22,9 @@ import sys
 OPT_WEIGHTS = np.array([
     [25.0, 10.0, 7.5, 5.0], # Joint
     [0.0, 0.0, 100.0, 100.0], # Sil Reproj
-    [0.0, 0.0, 0.0, 0.0], # Betas
+    [0.0, 10.0, 5.0, 1.0], # Betas
     [0.0, 100.0, 100.0, 100.0], # Limits
-    [0.0, 0.0, 0.0, 0.0], # Splay
+    [0.0, 0.1, 0.1, 0.1], # Splay
     [500.0, 100.0, 100.0, 100.0], # Temporal
     [150, 500, 500, 500], # Num iterations
     [1e-1, 5e-3, 5e-3, 2.5e-3]]) # Learning Rate
@@ -71,7 +71,7 @@ def main():
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
 
-    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE)
+    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE, image_range=range(140, 200))
 
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
