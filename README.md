@@ -27,6 +27,13 @@ Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/ab
    python optimize_to_joints.py
    ```
 
+## Usage
+I am currently running a hyperparameter sweep for the rs_dog sequence. Will upload this & a results gif as soon as I can.
+
+To run on your own videos, you require silhouette segmentations and joint annotations. View the example BADJA data as a starting point. You may then also need to slightly tune the hyperparameter weights, particularly if your sequence depicts fast motion or contains lots of rotation. 
+
+Set the shape_family id (according to the animal type) for best results.
+
 ### Acknowledgements
 If you find this fitting code useful for your research, please consider citing the following paper:
 
