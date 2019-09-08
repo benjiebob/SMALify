@@ -61,14 +61,12 @@ class ImageExporter():
 
 def main():
     BADJA_PATH = "smal_fitter/BADJA"
-    INPUT_PATH = "/data/cvfs/bjb56/data/smal_data/smal_joints/hg/24_04/prediction/"
-
     OUTPUT_DIR = "smal_fitter/checkpoints/{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 
     SHAPE_FAMILY = [1]
-    WINDOW_SIZE = 100
-    CROP_SIZE = 256
-    GPU_IDS = "1"
+    WINDOW_SIZE = 100 # Reduce this to reduce number of frames processed in one go. Bigger is better but more memory intensive.
+    CROP_SIZE = 256 
+    GPU_IDS = "0" # GPU number to run on
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
