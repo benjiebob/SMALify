@@ -21,6 +21,10 @@ Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/ab
 
 5. Create a checkpoints directory
 
+   ```
+   mkdir smal_fitter/checkpoints
+   ```
+
 6. Run the python3 script
    ```
    cd smal_fitter
