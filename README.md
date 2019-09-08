@@ -21,7 +21,8 @@ Fitting code used as part of the Creatures Great and SMAL paper.
 
 6. Run the python3 script
    ```
-   python optimize_joints.py
+   cd smal_fitter
+   python optimize_to_joints.py
    ```
 
 ### Acknowledgements
