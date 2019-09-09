@@ -1,4 +1,4 @@
-WARNING: This public respository is still in beta... There has been a considerable rewrite (particularly swapping ChumPy with Neural Mesh Renderer, using PyTorch etc.) since the original paper. I am slowly bringing this up to speed in my free moments, but for now, please use at your own risk :)
+WARNING: This public respository is still in beta... There has been a considerable rewrite (particularly swapping ChumPy with Neural Mesh Renderer, using PyTorch etc.) since the original paper. I am bringing this up to speed in my free moments, but for now, please use at your own risk :)
 
 # Creatures Great and SMAL
 Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/abs/1811.05804) paper.
