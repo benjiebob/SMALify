@@ -11,10 +11,10 @@ from utils import crop_to_silhouette
 import os
 import json
 
-from smal.joint_catalog import SMALJointInfo
+import config
 
 def load_badja_sequence(BADJA_PATH, sequence_name, crop_size, image_range = None):
-    annotated_classes = SMALJointInfo().annotated_classes
+    annotated_classes = config.ANNOTATED_CLASSES
 
     file_names = []
     rgb_imgs = []

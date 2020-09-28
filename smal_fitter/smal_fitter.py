@@ -1,6 +1,5 @@
 
-from smal.smal3d_renderer import SMAL3DRenderer
-from smal.draw_smal_joints import SMALJointDrawer
+from draw_smal_joints import SMALJointDrawer
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,12 +14,14 @@ import torch.nn as nn
 
 from functools import reduce
 
-from joint_limits_prior import LimitPrior
-
-SMAL_DATA_PATH = 'smal/smal_CVPR2017_data.pkl'
+from p3d_renderer import Renderer
+from smal_model.smal_torch import SMAL
+from priors.pose_prior_35 import Prior
+from priors.joint_limits_prior import LimitPrior
+import config
 
 class SMALFitter(nn.Module):
-    def __init__(self, data_batch, batch_size, shape_family, n_betas = 20):
+    def __init__(self, device, data_batch, batch_size, shape_family, n_betas = 20):
         super(SMALFitter, self).__init__()
 
         self.rgb_imgs, self.sil_imgs, self.target_joints, self.target_visibility = data_batch
@@ -28,12 +29,15 @@ class SMALFitter(nn.Module):
 
         assert self.rgb_imgs.max() <= 1.0 and self.rgb_imgs.min() >= 0.0, "RGB Image range is incorrect"
 
+        self.device = device
         self.num_images = self.rgb_imgs.shape[0]
+        self.image_size = self.rgb_imgs.shape[2]
+
         self.batch_size = batch_size
         self.n_betas = n_betas
 
         self.shape_family_list = np.array(shape_family)
-        with open(SMAL_DATA_PATH, 'rb') as f:
+        with open(config.SMAL_DATA_FILE, 'rb') as f:
             u = pkl._Unpickler(f)
             u.encoding = 'latin1'
             smal_data = u.load()
@@ -43,8 +47,8 @@ class SMALFitter(nn.Module):
         invcov = np.linalg.inv(model_covs + 1e-5 * np.eye(model_covs.shape[0]))
         prec = np.linalg.cholesky(invcov)
 
-        self.betas_prec = torch.FloatTensor(prec)[:n_betas, :n_betas].cuda()
-        self.mean_betas = torch.FloatTensor(smal_data['cluster_means'][shape_family][0])[:n_betas].cuda()
+        self.betas_prec = torch.FloatTensor(prec)[:n_betas, :n_betas].to(device)
+        self.mean_betas = torch.FloatTensor(smal_data['cluster_means'][shape_family][0])[:n_betas].to(device)
         self.betas = nn.Parameter(self.mean_betas.clone().unsqueeze(0)) # Shape parameters (1 for the entire sequence... note expand rather than repeat)
         
         # self.betas.register_hook(self.print_grads)
@@ -52,39 +56,41 @@ class SMALFitter(nn.Module):
         self.smal_joint_drawer = SMALJointDrawer()
 
         limit_prior = LimitPrior()
-        self.max_limits = torch.FloatTensor(limit_prior.max_values).view(32, 3).cuda()
-        self.min_limits = torch.FloatTensor(limit_prior.min_values).view(32, 3).cuda()
+        self.pose_prior = Prior(config.WALKING_PRIOR_FILE, device)
+
+        # self.max_limits = torch.FloatTensor(limit_prior.max_values).view(config.N_POSE, 3).to(device)
+        # self.min_limits = torch.FloatTensor(limit_prior.min_values).view(config.N_POSE, 3).to(device)
         
-        global_rotation = torch.FloatTensor([0, 0, 3 * np.pi / 2])[None, :].cuda().repeat(self.num_images, 1) # Global Init (Head-On)
+        global_rotation = torch.FloatTensor([0, 0, 3 * np.pi / 2])[None, :].to(device).repeat(self.num_images, 1) # Global Init (Head-On)
         self.global_rotation = nn.Parameter(global_rotation)
 
         # Use this to restrict global rotation if necessary
-        self.global_mask = torch.ones(1, 3).cuda()
+        self.global_mask = torch.ones(1, 3).to(device)
         # self.global_mask[:2] = 0.0 
 
-        trans = torch.FloatTensor([0.0, 0.0, 0.0])[None, :].cuda().repeat(self.num_images, 1) # Trans Init
+        trans = torch.FloatTensor([0.0, 0.0, 0.0])[None, :].to(device).repeat(self.num_images, 1) # Trans Init
         self.trans = nn.Parameter(trans)
 
-        default_joints = torch.zeros(self.num_images, 32, 3).cuda()
+        default_joints = torch.zeros(self.num_images, config.N_POSE, 3).to(device)
         self.joint_rotations = nn.Parameter(default_joints)
 
         # This is a very simple prior over joint rotations, preventing 'splaying' and 'twisting' motions.
-        self.rotation_mask = torch.ones(32, 3).cuda()
-        self.rotation_mask[25:32] = 0.0
+        self.rotation_mask = torch.ones(config.N_POSE, 3).to(device)
+        # self.rotation_mask[25:32] = 0.0
 
-        self.rotation_mask[:, [0, 2]] = 0.0
-        self.rotation_mask[:7, [0, 2]] = 1.0
-        self.rotation_mask[[15, 16], [0, 2]] = 1.0
+        # self.rotation_mask[:, [0, 2]] = 0.0
+        # self.rotation_mask[:7, [0, 2]] = 1.0
+        # self.rotation_mask[[15, 16], [0, 2]] = 1.0
       
         # setup renderers
-        self.model_renderer = SMAL3DRenderer(256, n_betas).cuda()
-        self.faces = self.model_renderer.smal_model.faces.cpu().data.numpy()
+        self.smal_model = SMAL(shape_family_id=shape_family)
+        self.renderer = Renderer(self.image_size, device)
 
     def print_grads(self, grad_output):
         print (grad_output)
 
     def forward(self, batch_range, weights, stage_id):
-        w_j2d, w_reproj, w_betas, w_limit, w_splay = weights
+        w_j2d, w_reproj, w_betas, w_pose, w_limit, w_splay = weights
         
         batch_params = {
             'global_rotation' : self.global_rotation[batch_range] * self.global_mask,
@@ -93,25 +99,40 @@ class SMALFitter(nn.Module):
             'trans' : self.trans[batch_range],
         }
 
-        target_joints = self.target_joints[batch_range].cuda()
-        target_visibility = self.target_visibility[batch_range].cuda()
-        sil_imgs = self.sil_imgs[batch_range].cuda()
+        target_joints = self.target_joints[batch_range].to(self.device)
+        target_visibility = self.target_visibility[batch_range].to(self.device)
+        sil_imgs = self.sil_imgs[batch_range].to(self.device)
     
-        rendered_silhouettes, rendered_joints, _ = self.model_renderer(batch_params)
+        verts, joints, Rs, v_shaped = self.smal_model(
+                batch_params['betas'], 
+                torch.cat([
+                    batch_params['global_rotation'].unsqueeze(1), 
+                    batch_params['joint_rotations']], dim = 1))
+
+        verts = verts + batch_params['trans'].unsqueeze(1)
+        joints = joints + batch_params['trans'].unsqueeze(1)
+
+        labelled_joints = joints[:, config.LABELLED_JOINTS]
+
+        rendered_silhouettes, rendered_joints = self.renderer(
+            verts, labelled_joints, self.smal_model.faces.unsqueeze(0).expand(verts.shape[0], -1, -1))
 
         objs = {}
 
         if w_j2d > 0:
-            rendered_joints[~target_visibility.byte()] = -1.0
-            target_joints[~target_visibility.byte()] = -1.0
+            rendered_joints[~target_visibility.bool()] = -1.0
+            target_joints[~target_visibility.bool()] = -1.0
 
-            objs['joint'] = w_j2d * F.l1_loss(rendered_joints, target_joints)
+            objs['joint'] = w_j2d * F.mse_loss(rendered_joints, target_joints)
 
-        if w_limit > 0:
-            zeros = torch.zeros_like(batch_params['joint_rotations'])
-            objs['limit'] = w_limit * torch.mean(
-                torch.max(batch_params['joint_rotations'] - self.max_limits, zeros) + \
-                torch.max(self.min_limits - batch_params['joint_rotations'], zeros))
+        # if w_limit > 0:
+        #     zeros = torch.zeros_like(batch_params['joint_rotations'])
+        #     objs['limit'] = w_limit * torch.mean(
+        #         torch.max(batch_params['joint_rotations'] - self.max_limits, zeros) + \
+        #         torch.max(self.min_limits - batch_params['joint_rotations'], zeros))
+
+        if w_pose > 0:
+            objs['pose'] = w_pose * self.pose_prior(batch_params['joint_rotations'])
 
         if w_splay > 0:
             objs['splay'] = w_splay * torch.sum(batch_params['joint_rotations'][:, :, [0, 2]] ** 2)
@@ -129,9 +150,9 @@ class SMALFitter(nn.Module):
         joint_rotations = self.joint_rotations * self.rotation_mask
         global_rotation = self.global_rotation * self.global_mask
 
-        joint_loss = 0
-        global_loss = 0
-        trans_loss = 0
+        joint_loss = torch.tensor(0).to(self.device)
+        global_loss = torch.tensor(0).to(self.device)
+        trans_loss = torch.tensor(0).to(self.device)
 
         for i in range(0, self.num_images - 1):
             global_loss += F.mse_loss(global_rotation[i], global_rotation[i + 1]) * w_temp
@@ -166,12 +187,28 @@ class SMALFitter(nn.Module):
 
             target_joints = self.target_joints[batch_range]
             target_visibility = self.target_visibility[batch_range]
-            rgb_imgs = self.rgb_imgs[batch_range].cuda()
-            sil_imgs = self.sil_imgs[batch_range].cuda()
+            rgb_imgs = self.rgb_imgs[batch_range].to(self.device)
+            sil_imgs = self.sil_imgs[batch_range].to(self.device)
 
             with torch.no_grad():
-                rendered_images, rendered_silhouettes, rendered_joints, _, verts, _ = self.model_renderer(batch_params, return_visuals = True)
-                rev_images, _, rev_joints, _, _, _ = self.model_renderer(batch_params, return_visuals = True, reverse_view = True, crop_to_silhouette = True)
+                verts, joints, Rs, v_shaped = self.smal_model(
+                    batch_params['betas'], 
+                    torch.cat([
+                        batch_params['global_rotation'].unsqueeze(1), 
+                        batch_params['joint_rotations']], dim = 1))
+
+                verts = verts + batch_params['trans'].unsqueeze(1)
+                joints = joints + batch_params['trans'].unsqueeze(1)
+
+                labelled_joints = joints[:, config.LABELLED_JOINTS]
+
+                rendered_silhouettes, rendered_joints, rendered_images = self.renderer(
+                    verts, labelled_joints, 
+                    self.smal_model.faces.unsqueeze(0).expand(verts.shape[0], -1, -1), render_texture=True)
+
+                _, rev_joints, rev_images = self.renderer(
+                    verts, labelled_joints, 
+                    self.smal_model.faces.unsqueeze(0).expand(verts.shape[0], -1, -1), render_texture=True)
 
                 target_vis = self.smal_joint_drawer.draw_joints(rgb_imgs, target_joints, visible = target_visibility, normalized=False)
                 rendered_images_vis = self.smal_joint_drawer.draw_joints(rendered_images, rendered_joints, visible = target_visibility, normalized=False)
@@ -185,7 +222,10 @@ class SMALFitter(nn.Module):
                 for batch_id, global_id in enumerate(batch_range):
                     collage_np = np.transpose(collage_rows[batch_id].numpy(), (1, 2, 0))
                     img_parameters = { k: v[batch_id].cpu().data.numpy() for (k, v) in batch_params.items() }
-                    image_exporter.export(collage_np, batch_id, global_id, img_parameters, verts, self.faces)
+                    image_exporter.export(
+                        (collage_np * 255.0).astype(np.uint8), 
+                        batch_id, global_id, img_parameters, 
+                        verts, self.smal_model.faces)
             
             
 

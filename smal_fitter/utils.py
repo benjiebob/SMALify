@@ -33,3 +33,26 @@ def crop_to_silhouette(sil_img, rgb_img, joints, target_size):
     scaled_joints = scaled_joints * scale_factor
     
     return sil_resize, rgb_resize, scaled_joints
+
+## Function courtesy of SMALST
+def perspective_proj_withz(X, cam, offset_z=0, cuda_device=0,norm_f=1., norm_z=0.,norm_f0=0.):
+    """
+    X: B x N x 3
+    cam: B x 3: [f, cx, cy] 
+    offset_z is for being compatible with previous code and is not used and should be removed
+    """
+
+    # B x 1 x 1
+    #f = norm_f * cam[:, 0].contiguous().view(-1, 1, 1)
+    f = norm_f0+norm_f * cam[:, 0].contiguous().view(-1, 1, 1)
+    # B x N x 1
+    z = norm_z + X[:, :, 2, None]
+
+    # Will z ever be 0? We probably should max it..
+    eps = 1e-6 * torch.ones(1).cuda(device=cuda_device)
+    z = torch.max(z, eps)
+    image_size_half = cam[0,1]
+    scale = f / (z*image_size_half)
+
+    # Offset is because cam is at -1
+    return torch.cat((scale * X[:, :, :2], z+offset_z),2)

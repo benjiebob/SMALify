@@ -23,6 +23,7 @@ OPT_WEIGHTS = np.array([
     [25.0, 10.0, 7.5, 5.0], # Joint
     [0.0, 0.0, 100.0, 100.0], # Sil Reproj
     [0.0, 10.0, 5.0, 1.0], # Betas
+    [0.0, 10.0, 5.0, 1.0], # Pose
     [0.0, 100.0, 100.0, 100.0], # Limits
     [0.0, 0.1, 0.1, 0.1], # Splay
     [500.0, 100.0, 100.0, 100.0], # Temporal
@@ -60,30 +61,33 @@ class ImageExporter():
         mesh.export(os.path.join(self.output_dirs[global_id], "st{0}_ep{1}.ply".format(self.stage_id, self.epoch_name)))
 
 def main():
-    BADJA_PATH = "smal_fitter/BADJA"
-    OUTPUT_DIR = "smal_fitter/checkpoints/{0}".format(time.strftime("%Y%m%d-%H%M%S"))
+    BADJA_PATH = "data/BADJA"
+    OUTPUT_DIR = "checkpoints/{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 
     SHAPE_FAMILY = [1]
-    WINDOW_SIZE = 100 # Reduce this to reduce number of frames processed in one go. Bigger is better but more memory intensive.
+    # WINDOW_SIZE = 100 # Reduce this to reduce number of frames processed in one go. Bigger is better but more memory intensive.
+    WINDOW_SIZE = 3
     CROP_SIZE = 256 
     GPU_IDS = "0" # GPU number to run on
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
 
-    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE, image_range=range(140, 200))
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE, image_range=[0])
 
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
 
     image_exporter = ImageExporter(OUTPUT_DIR, filenames)
 
-    model = SMALFitter(data, WINDOW_SIZE, SHAPE_FAMILY)
+    model = SMALFitter(device, data, WINDOW_SIZE, SHAPE_FAMILY)
     for stage_id, weights in enumerate(OPT_WEIGHTS.T):
-        opt_weight = weights[:5]
-        w_temp = weights[5]
-        epochs = int(weights[6])
-        lr = weights[7]
+        opt_weight = weights[:6]
+        w_temp = weights[6]
+        epochs = int(weights[7])
+        lr = weights[8]
 
         optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.5, 0.999))
 
@@ -116,7 +120,7 @@ def main():
             acc_loss.backward()
             optimizer.step()
 
-            if epoch_id % 10 == 0:
+            if epoch_id % 1 == 0:
                 model.generate_visualization(image_exporter)
 
     image_exporter.stage_id = 10

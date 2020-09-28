@@ -32,13 +32,13 @@ class ImageExporter():
             pkl.dump(img_parameters, f)
 
 def main():
-    BADJA_PATH = "smal_fitter/BADJA"
+    BADJA_PATH = "data/BADJA"
     SHAPE_FAMILY = [1]
 
     CHECKPOINT_NAME = "rs_dog"
     EPOCH_NAME = "st10_ep0"
 
-    OUTPUT_DIR = os.path.join("smal_fitter", "exported", CHECKPOINT_NAME, EPOCH_NAME)
+    OUTPUT_DIR = os.path.join("exported", CHECKPOINT_NAME, EPOCH_NAME)
     WINDOW_SIZE = 5
     CROP_SIZE = 256
     GPU_IDS = "0"
@@ -48,7 +48,7 @@ def main():
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
 
-    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE)
+    data, filenames = load_badja_sequence(BADJA_PATH, CHECKPOINT_NAME, CROP_SIZE)
 
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))

@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from smal.joint_catalog import SMALJointInfo
+from joint_catalog import SMALJointInfo
 from torchvision.utils import make_grid
 from matplotlib import cm
 import matplotlib.pyplot as plt
