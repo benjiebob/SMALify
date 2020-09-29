@@ -9,6 +9,7 @@ Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/ab
    git clone --recurse-submodules https://github.com/benjiebob/CreaturesGreatAndSMAL
    cd CreaturesGreatAndSMAL
    ```
+   Note: If you don't clone **with submodules** you won't get the sample data from BADJA/StanfordExtra.
     
 2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d)
 
