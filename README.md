@@ -12,7 +12,7 @@ Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/ab
     
 2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d)
 
-3. Clone the [SMAL-ST](http://smal.is.tue.mpg.de/) project website in order to access the latest version of the SMAL deformable animal model. You should copy all of [these files](https://github.com/silviazuffi/smalst/tree/master/smpl_models) underneath a SMALViewer/data directory. 
+3. Clone the [SMAL-ST](http://smal.is.tue.mpg.de/) project website in order to access the latest version of the SMAL deformable animal model. You should copy all of [these files](https://github.com/silviazuffi/smalst/tree/master/smpl_models) underneath a CreaturesGreatAndSMAL/data/smal directory. 
 
    Windows tip: If you are a Windows user, you can use these files but you'll need to edit the line endings. Try the following Powershell commands, shown here on one example:
      ```
