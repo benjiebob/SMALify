@@ -15,8 +15,9 @@ from smal_fitter import SMALFitter
 
 import torch
 import imageio
+import config
 
-from data_loader import load_badja_sequence
+from data_loader import load_badja_sequence, load_stanford_sequence
 import time
 
 import pickle as pkl
@@ -32,23 +33,24 @@ class ImageExporter():
             pkl.dump(img_parameters, f)
 
 def main():
-    BADJA_PATH = "data/BADJA"
-    SHAPE_FAMILY = [1]
-
-    CHECKPOINT_NAME = "rs_dog"
-    EPOCH_NAME = "st10_ep0"
-
-    OUTPUT_DIR = os.path.join("exported", CHECKPOINT_NAME, EPOCH_NAME)
-    WINDOW_SIZE = 5
-    CROP_SIZE = 256
-    GPU_IDS = "0"
-
-    image_exporter = ImageExporter(OUTPUT_DIR)
+    OUTPUT_DIR = os.path.join("exported", config.CHECKPOINT_NAME, config.EPOCH_NAME)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
+    os.environ["CUDA_VISIBLE_DEVICES"] = config.GPU_IDS
 
-    data, filenames = load_badja_sequence(BADJA_PATH, CHECKPOINT_NAME, CROP_SIZE)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    dataset, name = config.SEQUENCE_OR_IMAGE_NAME.split(":")
+
+    if dataset == "badja":
+        data, filenames = load_badja_sequence(
+            config.BADJA_PATH, name, 
+            config.CROP_SIZE, image_range=config.IMAGE_RANGE)
+    else:
+        data, filenames = load_stanford_sequence(
+            config.STANFORD_EXTRA_PATH, name,
+            config.CROP_SIZE
+        )
 
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
@@ -57,8 +59,16 @@ def main():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
-    model = SMALFitter(data, WINDOW_SIZE, SHAPE_FAMILY)
-    model.load_checkpoint(os.path.join("smal_fitter", "checkpoints", CHECKPOINT_NAME), EPOCH_NAME)
+    use_unity_prior = config.SHAPE_FAMILY == 1 and not config.FORCE_SMAL_PRIOR
+
+    if not use_unity_prior and not config.ALLOW_LIMB_SCALING:
+        print("WARNING: Limb scaling is only recommended for the new Unity prior. TODO: add a regularizer to constrain scale parameters.")
+        config.ALLOW_LIMB_SCALING = False
+
+    image_exporter = ImageExporter(OUTPUT_DIR)
+    model = SMALFitter(device, data, config.WINDOW_SIZE, config.SHAPE_FAMILY, use_unity_prior)
+
+    model.load_checkpoint(os.path.join("smal_fitter", "checkpoints", config.CHECKPOINT_NAME), config.EPOCH_NAME)
     model.generate_visualization(image_exporter) # Final stage
 
 if __name__ == '__main__':

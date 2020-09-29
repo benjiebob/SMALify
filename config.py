@@ -23,6 +23,12 @@ SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
 IMAGE_RANGE = range(0, 10) # Frames to process from sequence. Ignored for stanford extra
 WINDOW_SIZE = 10 # Changed number of frames processed in one go.
 
+# Generate video settings
+CHECKPOINT_NAME = "CHECKPOINT_TO_RUN"
+EPOCH_NAME = "st10_ep0" # convention used for the final output file. Don't change this without good reason.
+
+
+
 # SMAL
 SMAL_FILE = join(data_path, 'smal', 'my_smpl_00781_4_all.pkl')
 SMAL_DATA_FILE = join(data_path, 'smal', 'my_smpl_data_00781_4_all.pkl')

@@ -31,29 +31,30 @@ Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/ab
 
 5. Inspect the directory paths in config.py and make sure they match your system.
 
-## Sample Usage
-The behaviour of this code is adaptable by using the config.py file.
+## QuickStart: Running the Fitter
 
-### Run on a sample video from the [BADJA](https://github.com/benjiebob/BADJA) dataset.
-
-   1. Run the python script
-   ```
-   python optimize_to_joints.py
-   ```
-
-### Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
-
-   1. Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
-
-   ```
-   #SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
-   SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02092339-Weimaraner/n02092339_748.jpg"
-   ```
-   2. Run the python script:
-   ```
-   cd smal_fitter
-   python optimize_to_joints.py
-   ```
+- Run on a sample video from the [BADJA](https://github.com/benjiebob/BADJA) dataset.
+   - Run the python script
+      ```
+      python optimize_to_joints.py
+      ```
+   - OPTIONAL: Generate a video visualization
+      - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
+      - Run the video generation script, which exports to CreaturesGreatAndSMAL/exported
+      ```
+      python generate_video.py
+      ```
+- Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
+   - Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
+      ```
+      #SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
+      SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02092339-Weimaraner/n02092339_748.jpg"
+      ```
+   - Run the python script:
+      ```
+      cd smal_fitter
+      python optimize_to_joints.py
+      ```
 
 ### Tutorial Notes and Conventions
 #### Running other BADJA/StanfordExtra sequences:
