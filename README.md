@@ -65,22 +65,21 @@ The behaviour of this code is adaptable by using the config.py file.
 #### Running on your own data
 The first job is to source keypoint/silhouette data for your input images. 
 
-##### StanfordExtra Joint Prediction
-   1. TODO: Release model for dog keypoint prediction, trained on StanfordExtra
-##### Manual Annotation (LabelMe)
-   1. I recommend using [LabelMe](https://github.com/wkentaro/labelme), which is fantastic software that makes annotating keypoints / silhouettes efficient.
-   2. Install the software, and then load the joint annotation execute
+1. Manual Annotation
+   1a. I recommend using [LabelMe](https://github.com/wkentaro/labelme), which is fantastic software that makes annotating keypoints / silhouettes efficient.
+   1b. Install the software, and then load the joint annotation execute
       ```
       labelme --labels labels.txt --nosortlabels
       ```
-   3. Next, generate the silhouette annotations
+   1c. Next, generate the silhouette annotations
       ```
       # TODO
       ```
-   4. TODO: Write script to load labelme files
-##### CreaturesGreatAndSMAL (CGAS) Joint Prediction
-   1. TODO: Release training/testing scripts for CreaturesGreatAndSMAL joint prediction, OJA methods etc.
-
+   1d. TODO: Write script to load labelme files
+2. StanfordExtra Joint Prediction
+   2a. TODO: Release model for dog keypoint prediction, trained on StanfordExtra
+3. CreaturesGreatAndSMAL (CGAS) Joint Prediction
+   3a. TODO: Release training/testing scripts for CreaturesGreatAndSMAL joint prediction, OJA methods etc.
 
 ### Acknowledgements
 If you find this fitting code and/or BADJA dataset useful for your research, please consider citing the following paper:
