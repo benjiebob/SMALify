@@ -3,13 +3,12 @@ WARNING: This public respository is still in beta... There has been a considerab
 # Creatures Great and SMAL
 Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/abs/1811.05804) paper.
 
-
-
 ## Installation
 1. Clone the repository with submodules and enter directory
    ```
    git clone --recurse-submodules https://github.com/benjiebob/CreaturesGreatAndSMAL
    cd CreaturesGreatAndSMAL
+   ```
     
 2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d)
 
