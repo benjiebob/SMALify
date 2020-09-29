@@ -27,6 +27,7 @@ Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/ab
    cd data/BADJA
    wget http://mi.eng.cam.ac.uk/~bjb56/datasets/badja_extra_videos.zip
    unzip badja_extra_videos.zip
+   ```
 
 5. Inspect the directory paths in config.py and make sure they match your system.
 
