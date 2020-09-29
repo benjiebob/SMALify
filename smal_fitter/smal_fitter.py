@@ -166,8 +166,9 @@ class SMALFitter(nn.Module):
                 # TODO: Add a simple regularizer to penalize log_betascale for this case.
                 all_betas = batch_params['betas']
 
-            beta_error = torch.tensordot(all_betas - self.mean_betas, self.betas_prec, dims = 1)
-            objs['betas'] = w_betas * torch.mean(beta_error ** 2)
+            diff_betas = (all_betas - self.mean_betas.unsqueeze(0)) # N, B
+            maha = diff_betas.unsqueeze(1) @ self.betas_prec @ diff_betas.unsqueeze(-1)
+            objs['betas'] = w_betas * maha.mean()
     
         if w_reproj > 0:
             objs['sil_reproj'] = w_reproj * F.l1_loss(rendered_silhouettes, sil_imgs)
@@ -204,7 +205,7 @@ class SMALFitter(nn.Module):
                 scale_list.append(img_parameters['log_betascale'])
 
         self.betas = torch.nn.Parameter(torch.from_numpy(np.mean(beta_list, axis = 0)).float().to(self.device))
-        self.log_beta_scales = torch.nn(torch.from_numpy(np.mean(scale_list, axis = 0)).float().to(self.device))
+        self.log_beta_scales = torch.nn.Parameter(torch.from_numpy(np.mean(scale_list, axis = 0)).float().to(self.device))
 
     def generate_visualization(self, image_exporter):
         rot_matrix = torch.from_numpy(R.from_euler('y', 180.0, degrees=True).as_dcm()).float().to(self.device)

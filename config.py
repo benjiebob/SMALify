@@ -1,8 +1,3 @@
-"""
-This file contains definitions of useful data stuctures and the paths
-for the datasets and data files necessary to run the code.
-Things you need to change: *_ROOT that indicate the path to each dataset
-"""
 from os.path import join
 import cv2
 import time
@@ -13,11 +8,9 @@ BADJA_PATH = "data/BADJA"
 STANFORD_EXTRA_PATH = "data/StanfordExtra"
 OUTPUT_DIR = "checkpoints/{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 
-WINDOW_SIZE = 10 # Changed number of frames processed in one go.
 CROP_SIZE = 256 
 VIS_FREQUENCY = 100
-PRINT_FREQ = 50
-GPU_IDS = "0" # GPU number to run on
+GPU_IDS = "0" # GPU number to run on (not applicable for CPU)
 
 # Run settings (I wouldn't recommend changing these unless you have good reason)
 FORCE_SMAL_PRIOR = False # Allow the more recent Unity-based prior for dogs.
@@ -28,6 +21,7 @@ SHAPE_FAMILY = 1 # Choose from Cat (e.g. House Cat/Tiger/Lion), Canine (e.g. Dog
 SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
 # SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02092339-Weimaraner/n02092339_748.jpg"
 IMAGE_RANGE = range(0, 10) # Frames to process from sequence. Ignored for stanford extra
+WINDOW_SIZE = 10 # Changed number of frames processed in one go.
 
 # SMAL
 SMAL_FILE = join(data_path, 'smal', 'my_smpl_00781_4_all.pkl')
@@ -54,8 +48,8 @@ OPT_WEIGHTS = [
     [0.0, 100.0, 100.0, 100.0], # Limits TODO!
     [0.0, 0.1, 0.1, 0.1], # Splay
     [500.0, 100.0, 100.0, 100.0], # Temporal
-    [500, 1000, 1000, 1000], # Num iterations
-    [5e-3, 5e-3, 5e-3, 5e-4]] # Learning Rate
+    [300, 1000, 1000, 1000], # Num iterations
+    [1e-2, 5e-3, 5e-3, 5e-3]] # Learning Rate
 
 
 # JOINT DEFINITIONS
@@ -74,16 +68,16 @@ CANONICAL_MODEL_JOINTS = [
   15, 15, # withers, throat (TODO: Labelled same as throat for now), throat 
   28] # tail middle
 
-# indicate invalid positions (i.e. not labelled) by -1
+# indicate invalid joints (i.e. not labelled) by -1
 BADJA_ANNOTATED_CLASSES = [
     14, 13, 12, # upper_left [paw, middle, top]
     24, 23, 22, # lower_left [paw, middle, top]
     10, 9, 8, # upper_right [paw, middle, top]
     20, 19, 18, # lower_right [paw, middle, top]
     25, 31, # tail [start, end] (note, missing the tail middle point)
-    36, 35, # ear base [left, right]
+    -1, -1, # ear base [left, right]
     33, -1, # nose, chin (note, missing the 'jaw base' point)
-    -1, -1, # ear tip [left, right]
+    36, 35, # ear tip [left, right]
     -1, -1, # eyes [left, right]
     -1, 15, # withers, throat
     28] # tail middle
@@ -108,9 +102,9 @@ MARKER_COLORS = [
     [60, 180, 75], [60, 180, 75], [60, 180, 75], # upper_right, green
     [0, 130, 200], [0, 130, 200], [0, 130, 200], # lower_right, blue
     [240, 50, 230], [240, 50, 230], # tail, majenta
-    [29, 98, 115], [255, 153, 204], # right_ear, turquoise & left_ear, pink
+    [255, 153, 204], [29, 98, 115], # left_ear, pink & right_ear, turquoise 
     [245, 130, 48], [245, 130, 48], # nose, chin
-    [29, 98, 115], [255, 153, 204], # right_tip, turquoise & left_ear, pink
+    [255, 153, 204], [29, 98, 115], # left_ear, pink & right_tip, turquoise
     [0, 0, 0], [0, 0, 0], # right eye, left eye: black
     [128, 0, 0], [128, 0, 0], # withers, throat, maroon
     [240, 50, 230]] # tail middle

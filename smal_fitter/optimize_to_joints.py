@@ -56,6 +56,9 @@ def main():
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = config.GPU_IDS
 
+    if not os.path.exists(config.OUTPUT_DIR):
+        os.mkdir(config.OUTPUT_DIR)
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     dataset, name = config.SEQUENCE_OR_IMAGE_NAME.split(":")
@@ -125,9 +128,8 @@ def main():
                 acc_loss.data, joint_loss.data, 
                 global_loss.data, trans_loss.data)
 
-            if epoch_id % config.PRINT_FREQ == 0:
-                t.set_description(desc)
-                t.refresh()
+            t.set_description(desc)
+            t.refresh()
 
             acc_loss = acc_loss + joint_loss + global_loss + trans_loss
             acc_loss.backward()
