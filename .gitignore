@@ -108,4 +108,5 @@ checkpoints/
 smal/
 extra_videos/
 exported/
+smpl_webuser/
 *.pkl
