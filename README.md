@@ -41,9 +41,9 @@ Fitting code used as part of the [Creatures Great and SMAL](https://arxiv.org/ab
    - OPTIONAL: Generate a video visualization
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
       - Run the video generation script, which exports to CreaturesGreatAndSMAL/exported
-      ```
-      python generate_video.py
-      ```
+         ```
+         python generate_video.py
+         ```
 - Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
    - Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
       ```
