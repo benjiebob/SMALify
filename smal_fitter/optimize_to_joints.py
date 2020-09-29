@@ -13,22 +13,14 @@ import pickle as pkl
 import torch
 import imageio
 
-from data_loader import load_badja_sequence
+from data_loader import load_badja_sequence, load_stanford_sequence
 import trimesh
+
+from tqdm import trange
 
 import os, time
 import sys
-
-OPT_WEIGHTS = np.array([
-    [25.0, 10.0, 7.5, 5.0], # Joint
-    [0.0, 0.0, 100.0, 100.0], # Sil Reproj
-    [0.0, 10.0, 5.0, 1.0], # Betas
-    [0.0, 10.0, 5.0, 1.0], # Pose
-    [0.0, 100.0, 100.0, 100.0], # Limits
-    [0.0, 0.1, 0.1, 0.1], # Splay
-    [500.0, 100.0, 100.0, 100.0], # Temporal
-    [150, 500, 500, 500], # Num iterations
-    [1e-1, 5e-3, 5e-3, 2.5e-3]]) # Learning Rate
+import config
 
 class ImageExporter():
     def __init__(self, output_dir, filenames):
@@ -61,29 +53,38 @@ class ImageExporter():
         mesh.export(os.path.join(self.output_dirs[global_id], "st{0}_ep{1}.ply".format(self.stage_id, self.epoch_name)))
 
 def main():
-    BADJA_PATH = "data/BADJA"
-    OUTPUT_DIR = "checkpoints/{0}".format(time.strftime("%Y%m%d-%H%M%S"))
-
-    SHAPE_FAMILY = [1]
-    # WINDOW_SIZE = 100 # Reduce this to reduce number of frames processed in one go. Bigger is better but more memory intensive.
-    WINDOW_SIZE = 3
-    CROP_SIZE = 256 
-    GPU_IDS = "0" # GPU number to run on
-
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = GPU_IDS
+    os.environ["CUDA_VISIBLE_DEVICES"] = config.GPU_IDS
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    data, filenames = load_badja_sequence(BADJA_PATH, "rs_dog", CROP_SIZE, image_range=[0])
+    dataset, name = config.SEQUENCE_OR_IMAGE_NAME.split(":")
+
+    if dataset == "badja":
+        data, filenames = load_badja_sequence(
+            config.BADJA_PATH, name, 
+            config.CROP_SIZE, image_range=config.IMAGE_RANGE)
+    else:
+        data, filenames = load_stanford_sequence(
+            config.STANFORD_EXTRA_PATH, name,
+            config.CROP_SIZE
+        )
 
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
 
-    image_exporter = ImageExporter(OUTPUT_DIR, filenames)
+    assert config.SHAPE_FAMILY >= 0, "Shape family should be greater than 0"
 
-    model = SMALFitter(device, data, WINDOW_SIZE, SHAPE_FAMILY)
-    for stage_id, weights in enumerate(OPT_WEIGHTS.T):
+    use_unity_prior = config.SHAPE_FAMILY == 1 and not config.FORCE_SMAL_PRIOR
+
+    if not use_unity_prior and not config.ALLOW_LIMB_SCALING:
+        print("WARNING: Limb scaling is only recommended for the new Unity prior. TODO: add a regularizer to constrain scale parameters.")
+        config.ALLOW_LIMB_SCALING = False
+
+    image_exporter = ImageExporter(config.OUTPUT_DIR, filenames)
+
+    model = SMALFitter(device, data, config.WINDOW_SIZE, config.SHAPE_FAMILY, use_unity_prior)
+    for stage_id, weights in enumerate(np.array(config.OPT_WEIGHTS).T):
         opt_weight = weights[:6]
         w_temp = weights[6]
         epochs = int(weights[7])
@@ -94,33 +95,45 @@ def main():
         if stage_id == 0:
             model.joint_rotations.requires_grad = False
             model.betas.requires_grad = False
+            model.log_beta_scales.requires_grad = False
             model.target_visibility *= 0
-            model.target_visibility[:, [9, 17, 3, 6, 11, 14]] = 1.0 # Turn on only torso points
+            model.target_visibility[:, config.TORSO_JOINTS] = 1.0 # Turn on only torso points
         else:
             model.joint_rotations.requires_grad = True
             model.betas.requires_grad = True
+            if config.ALLOW_LIMB_SCALING:
+                model.log_beta_scales.requires_grad = True
             model.target_visibility = data[-1].clone()
 
-        for epoch_id in range(epochs):
+        t = trange(epochs, leave=True)
+        for epoch_id in t:
             image_exporter.stage_id = stage_id
             image_exporter.epoch_name = str(epoch_id)
 
             acc_loss = 0
             optimizer.zero_grad()
-            for j in range(0, dataset_size, WINDOW_SIZE):
-                batch_range = list(range(j, min(dataset_size, j + WINDOW_SIZE)))
+            for j in range(0, dataset_size, config.WINDOW_SIZE):
+                batch_range = list(range(j, min(dataset_size, j + config.WINDOW_SIZE)))
                 loss, losses = model(batch_range, opt_weight, stage_id)
-                acc_loss += loss
-                print ("Optimizing Stage: {}\t Epoch: {}, Range: {}, Loss: {}, Detail: {}".format(stage_id, epoch_id, batch_range, loss.data, losses))
+                acc_loss += loss.mean()
+                # print ("Optimizing Stage: {}\t Epoch: {}, Range: {}, Loss: {}, Detail: {}".format(stage_id, epoch_id, batch_range, loss.data, losses))
 
             joint_loss, global_loss, trans_loss = model.get_temporal(w_temp)
 
-            print ("EPOCH: Optimizing Stage: {}\t Epoch: {}, Loss: {}, Temporal: ({}, {}, {})".format(stage_id, epoch_id, acc_loss.data, joint_loss.data, global_loss.data, trans_loss.data))
-            acc_loss += joint_loss + global_loss + trans_loss
+            desc = "EPOCH: Optimizing Stage: {}\t Epoch: {}, Loss: {:.2f}, Temporal: ({}, {}, {})".format(
+                stage_id, epoch_id, 
+                acc_loss.data, joint_loss.data, 
+                global_loss.data, trans_loss.data)
+
+            if epoch_id % config.PRINT_FREQ == 0:
+                t.set_description(desc)
+                t.refresh()
+
+            acc_loss = acc_loss + joint_loss + global_loss + trans_loss
             acc_loss.backward()
             optimizer.step()
 
-            if epoch_id % 1 == 0:
+            if epoch_id % config.VIS_FREQUENCY == 0:
                 model.generate_visualization(image_exporter)
 
     image_exporter.stage_id = 10

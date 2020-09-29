@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from nibabel import eulerangles
 
 def crop_to_silhouette(sil_img, rgb_img, joints, target_size):
     assert len(sil_img.shape) == 2, "Silhouette image is not HxW"
@@ -56,3 +57,7 @@ def perspective_proj_withz(X, cam, offset_z=0, cuda_device=0,norm_f=1., norm_z=0
 
     # Offset is because cam is at -1
     return torch.cat((scale * X[:, :, :2], z+offset_z),2)
+
+def eul_to_axis(euler_value):
+    theta, vector = eulerangles.euler2angle_axis(euler_value[2], euler_value[1], euler_value[0])
+    return vector * theta

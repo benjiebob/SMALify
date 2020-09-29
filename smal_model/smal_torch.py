@@ -21,7 +21,7 @@ def undo_chumpy(x):
     return x if isinstance(x, np.ndarray) else x.r
 
 class SMAL(nn.Module):
-    def __init__(self, shape_family_id=-1, dtype=torch.float):
+    def __init__(self, device, shape_family_id=-1, dtype=torch.float):
         super(SMAL, self).__init__()
 
         # -- Load SMPL params --
@@ -35,7 +35,7 @@ class SMAL(nn.Module):
 
         self.f = dd['f']
 
-        self.faces = torch.from_numpy(self.f.astype(int))
+        self.faces = torch.from_numpy(self.f.astype(int)).to(device)
 
         v_template = get_smal_template(
             model_name=config.SMAL_FILE, 
@@ -48,7 +48,7 @@ class SMAL(nn.Module):
         # Mean template vertices
         self.v_template = Variable(
             torch.Tensor(v),
-            requires_grad=False)
+            requires_grad=False).to(device)
         # Size of mesh [Number of vertices, 3]
         self.size = [self.v_template.shape[0], 3]
         self.num_betas = dd['shapedirs'].shape[-1]
@@ -57,12 +57,12 @@ class SMAL(nn.Module):
         shapedir = np.reshape(
             undo_chumpy(dd['shapedirs']), [-1, self.num_betas]).T
         self.shapedirs = Variable(
-            torch.Tensor(shapedir), requires_grad=False)
+            torch.Tensor(shapedir), requires_grad=False).to(device)
 
         # Regressor for joint locations given shape 
         self.J_regressor = Variable(
             torch.Tensor(dd['J_regressor'].T.todense()),
-            requires_grad=False)
+            requires_grad=False).to(device)
 
         # Pose blend shape basis
         num_pose_basis = dd['posedirs'].shape[-1]
@@ -70,7 +70,7 @@ class SMAL(nn.Module):
         posedirs = np.reshape(
             undo_chumpy(dd['posedirs']), [-1, num_pose_basis]).T
         self.posedirs = Variable(
-            torch.Tensor(posedirs), requires_grad=False)
+            torch.Tensor(posedirs), requires_grad=False).to(device)
 
         # indices of parents for each joints
         self.parents = dd['kintree_table'][0].astype(np.int32)
@@ -78,7 +78,7 @@ class SMAL(nn.Module):
         # LBS weights
         self.weights = Variable(
             torch.Tensor(undo_chumpy(dd['weights'])),
-            requires_grad=False)
+            requires_grad=False).to(device)
 
     def __call__(self, beta, theta, trans=None, del_v=None, betas_logscale=None, get_skin=True):
 
@@ -125,7 +125,7 @@ class SMAL(nn.Module):
 
         #4. Get the global joint location
         self.J_transformed, A = batch_global_rigid_transformation(
-            Rs, J, self.parents)
+            Rs, J, self.parents, betas_logscale=betas_logscale)
 
 
         # 5. Do skinning:

@@ -102,9 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# custom
 checkpoints/
-*.pkl
+smal/
 extra_videos/
 exported/
-safe/
-data/
+*.pkl

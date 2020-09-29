@@ -7,3 +7,6 @@
 [submodule "smal/smpl"]
 	path = smal/smpl
 	url = https://github.com/benjiebob/smpl
+[submodule "data/StanfordExtra"]
+	path = data/StanfordExtra
+	url = https://github.com/benjiebob/StanfordExtra

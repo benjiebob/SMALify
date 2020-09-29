@@ -114,7 +114,7 @@ class Prior(object):
         # return (x[self.use_ind] - self.mean).dot(self.precs)
         # res = (x[self.use_ind] - self.mean).dot(self.precs)
 
-        mean_sub = x - self.mean.unsqueeze(0)
+        mean_sub = x.reshape(-1, 35*3) - self.mean.unsqueeze(0)
         res = torch.tensordot(mean_sub, self.precs, dims = ([1], [0])) * self.use_ind_tch
         # res_ch = (x.data.cpu().numpy() - self.mean_ch).dot(self.precs_ch) * self.use_ind
 
