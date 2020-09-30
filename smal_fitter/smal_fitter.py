@@ -55,10 +55,10 @@ class SMALFitter(nn.Module):
             prec = np.linalg.cholesky(invcov)        
 
             self.betas_prec = torch.FloatTensor(prec).to(device)
-            self.betas = nn.Parameter(self.mean_betas[:20]) # Shape parameters (1 for the entire sequence... note expand rather than repeat)
+            self.betas = nn.Parameter(self.mean_betas[:20].clone()) # Shape parameters (1 for the entire sequence... note expand rather than repeat)
             # TODO: edit self.betas here according to N_BETAS. 
             # Either pad with zeros or restrict to less than 20
-            self.log_beta_scales = torch.nn.Parameter(self.mean_betas[20:])
+            self.log_beta_scales = torch.nn.Parameter(self.mean_betas[20:].clone())
         else:
             model_covs = np.array(smal_data['cluster_cov'])[[shape_family]][0]
 
@@ -67,7 +67,7 @@ class SMALFitter(nn.Module):
 
             self.betas_prec = torch.FloatTensor(prec)[:config.N_BETAS, :config.N_BETAS].to(device)
             self.mean_betas = torch.FloatTensor(smal_data['cluster_means'][[shape_family]][0])[:config.N_BETAS].to(device)
-            self.betas = nn.Parameter(self.mean_betas) # Shape parameters (1 for the entire sequence... note expand rather than repeat)
+            self.betas = nn.Parameter(self.mean_betas.clone()) # Shape parameters (1 for the entire sequence... note expand rather than repeat)
             self.log_beta_scales = torch.nn.Parameter(
                 torch.zeros(self.num_images, 6).to(device), requires_grad=False)
 
@@ -167,9 +167,8 @@ class SMALFitter(nn.Module):
                 all_betas = batch_params['betas']
 
             diff_betas = (all_betas - self.mean_betas.unsqueeze(0)) # N, B
-            maha = diff_betas.unsqueeze(1) @ self.betas_prec @ diff_betas.unsqueeze(-1)
-            objs['betas'] = w_betas * maha.mean()
-    
+            res = torch.tensordot(diff_betas , self.betas_prec, dims = ([1], [0]))
+            objs['betas'] = w_betas * (res ** 2).mean()    
         if w_reproj > 0:
             objs['sil_reproj'] = w_reproj * F.l1_loss(rendered_silhouettes, sil_imgs)
 

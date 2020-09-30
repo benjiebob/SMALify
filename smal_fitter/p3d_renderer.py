@@ -44,7 +44,7 @@ class Renderer(torch.nn.Module):
             faces_per_pixel=1, 
         )
         
-        lights = PointLights(device=device, location=[[0.0, 1.0, 0.0]])
+        lights = PointLights(device=device, location=[[0.0, 0.0, 3.0]])
 
         self.color_renderer = MeshRenderer(
             rasterizer=MeshRasterizer(

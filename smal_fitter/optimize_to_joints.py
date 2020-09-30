@@ -99,8 +99,9 @@ def main():
             model.joint_rotations.requires_grad = False
             model.betas.requires_grad = False
             model.log_beta_scales.requires_grad = False
+            target_visibility = model.target_visibility.clone()
             model.target_visibility *= 0
-            model.target_visibility[:, config.TORSO_JOINTS] = 1.0 # Turn on only torso points
+            model.target_visibility[:, config.TORSO_JOINTS] = target_visibility[:, config.TORSO_JOINTS] # Turn on only torso points
         else:
             model.joint_rotations.requires_grad = True
             model.betas.requires_grad = True

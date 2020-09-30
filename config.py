@@ -19,12 +19,12 @@ ALLOW_LIMB_SCALING = True # Allow scaling parameters, see Who Left the Dogs Out?
 # Sequence/Image Settings
 SHAPE_FAMILY = 1 # Choose from Cat (e.g. House Cat/Tiger/Lion), Canine (e.g. Dog/Wolf), Equine (e.g. Horse/Zebra), Bovine (e.g. Cow), Hippo
 SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
-# SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02092339-Weimaraner/n02092339_748.jpg"
+# SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02099601-golden_retriever/n02099601_176.jpg"
 IMAGE_RANGE = range(0, 10) # Frames to process from sequence. Ignored for stanford extra
 WINDOW_SIZE = 10 # Changed number of frames processed in one go.
 
 # Generate video settings
-CHECKPOINT_NAME = "20200930-101825" # the directory to run
+CHECKPOINT_NAME = "20200930-121001" # the directory to run
 EPOCH_NAME = "st10_ep0" # convention used for the final output file. Don't change this without good reason.
 
 # SMAL
@@ -44,16 +44,27 @@ IMG_RES = 224
 MESH_COLOR = [0, 172, 223]
 
 # OPTIMIZER - You may
+# OPT_WEIGHTS = [
+#     [25.0, 10.0, 7.5, 5.0], # Joint
+#     [0.0, 0.0, 100.0, 250.0], # Sil Reproj
+#     [0.0, 100.0, 100.0, 100.0], # Betas
+#     [0.0, 10.0, 5.0, 1.0], # Pose
+#     [0.0, 100.0, 100.0, 100.0], # Limits TODO!
+#     [0.0, 0.1, 0.1, 0.1], # Splay
+#     [500.0, 100.0, 100.0, 100.0], # Temporal
+#     [300, 1000, 1000, 1000], # Num iterations
+#     [1e-2, 5e-3, 5e-3, 5e-3]] # Learning Rate
+
 OPT_WEIGHTS = [
     [25.0, 10.0, 7.5, 5.0], # Joint
-    [0.0, 0.0, 100.0, 250.0], # Sil Reproj
-    [0.0, 100.0, 50.0, 10.0], # Betas
-    [0.0, 10.0, 5.0, 1.0], # Pose
+    [0.0, 500.0, 5000.0, 5000.0], # Sil Reproj
+    [0.0, 1.0, 1.0, 1.0], # Betas
+    [0.0, 1.0, 1.0, 1.0], # Pose
     [0.0, 100.0, 100.0, 100.0], # Limits TODO!
     [0.0, 0.1, 0.1, 0.1], # Splay
     [500.0, 100.0, 100.0, 100.0], # Temporal
-    [300, 1000, 1000, 1000], # Num iterations
-    [1e-2, 5e-3, 5e-3, 5e-3]] # Learning Rate
+    [150, 400, 600, 800], # Num iterations
+    [5e-3, 5e-3, 5e-4, 1e-4]] # Learning Rate
 
 
 # JOINT DEFINITIONS
@@ -65,7 +76,7 @@ CANONICAL_MODEL_JOINTS = [
   14, 13, 12, # upper_right [paw, middle, top]
   24, 23, 22, # lower_right [paw, middle, top]
   25, 31, # tail [start, end]
-  34, 33, # ear base [left, right]
+  33, 34, # ear base [left, right]
   35, 36, # nose, chin
   38, 37, # ear tip [left, right]
   39, 40, # eyes [left, right]
