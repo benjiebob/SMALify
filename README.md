@@ -73,8 +73,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
          ffmpeg -framerate 2 -pattern_type glob -i '*.png' -pix_fmt yuv420p results.mp4
          ```
 - Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
-
-      <img src="docs/stanfordextra_opt.gif">
+   <img src="docs/stanfordextra_opt.gif">
    - Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
       ```
       # SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
