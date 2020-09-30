@@ -55,7 +55,6 @@ def main():
     dataset_size = len(filenames)
     print ("Dataset size: {0}".format(dataset_size))
 
-    plt.figure()
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
@@ -68,7 +67,7 @@ def main():
     image_exporter = ImageExporter(OUTPUT_DIR)
     model = SMALFitter(device, data, config.WINDOW_SIZE, config.SHAPE_FAMILY, use_unity_prior)
 
-    model.load_checkpoint(os.path.join("smal_fitter", "checkpoints", config.CHECKPOINT_NAME), config.EPOCH_NAME)
+    model.load_checkpoint(os.path.join("checkpoints", config.CHECKPOINT_NAME), config.EPOCH_NAME)
     model.generate_visualization(image_exporter) # Final stage
 
 if __name__ == '__main__':

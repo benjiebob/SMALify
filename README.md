@@ -1,4 +1,4 @@
-WARNING: This respository is still in beta! I am bringing this up to speed in my free moments, but for now, please use at your own risk :)
+WARNING: This respository is still in beta and under active development! I am bringing this up to speed in my free moments, but for now, please use at your own risk. If you find there's something not working properly, it's worth doing a quick git pull to see if I've fixed it :)
 
 # SMALify
 This repository contains a implementation for performing 3D animal (quadruped) reconstruction from a monocular image or video. The system adapts the pose (limb positions) and shape (animal type/height/weight) parameters for the SMAL deformable quadruped model, as well as camera parameters until the projected SMAL model aligns with 2D keypoints and silhouette segmentations extracted from the input frame(s).
@@ -56,11 +56,18 @@ The aim of this repository is to provide code for users to derive full 3D recons
          | .ply  | Mesh file, can be viewed in e.g. [MeshLab](https://www.meshlab.net/)  |
          | .pkl  | Pickle file, contains the latest model/camera parameters |
 
-   - Optionally, generate a video visualization
+   - Generate fits for the video
+      - The generate_video.py function loads the exported .pkl files generated during the fitting process and exports the data. This is generally usful if your pkl files are created using alternative methods, e.g. Who Left the Dogs Out? (coming soon!) or your own research. 
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
-      - Run the video generation script, which exports the video to CreaturesGreatAndSMAL/exported
+      - By default the code will load the final optimized meshes, indicated by EPOCH_NAME = "st10_ep0". If you want to generate a video from intermediate results, set this to some different stage/iteration. 
+      - Run the video generation script, which exports the video to SMALify/exported
          ```
          python smal_fitter/generate_video.py
+         ```
+      - Create a video using e.g. [FFMPEG](https://ffmpeg.org/):
+         ```
+         cd exported/CHECKPOINT_NAME/EPOCH_NAME
+         ffmpeg -framerate 1 -pattern_type glob -i '*.png' -pix_fmt yuv420p results.mp4
          ```
 - Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
    - Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
@@ -114,7 +121,9 @@ The first job is to generate keypoint/silhouette data for your input image(s).
 | 2D Silhouette  | Project the SMAL model with latest parameters and compare rendered silhouette to input 2D silhouette. | If the shape of your reconstructed animal doesn't match well (e.g. maybe it's too thin?), try increasing this. |
 | Temporal  | Constrain the change in SMAL parameters between frames. (Only for videos) | If your limbs move unnaturally between video frames, try adapting this. |
 
-Note that to avoid poor local minima, the optimization proceeds over multiple stages and the weights vary at each stage. For example, only once an approximate camera location has been found should there be 2D joint loss, and only once an approximate set of limb positions have been found should there be a 2D silhouette loss.
+   Note that to avoid poor local minima, the optimization proceeds over multiple stages and the weights vary at each stage. For example, only once an approximate camera location has been found should there be 2D joint loss, and only once an approximate set of limb positions have been found should there be a 2D silhouette loss.
+
+- To improve efficiency it is very likely that the number of iterations (again a setting in OPT_WEIGHTS) can be reduced for many sequences. I've err'd on the side of caution for this release by running many more iterations than probably needed.
 
 ## Acknowledgements
 This repository owes a great deal to the following works and authors:
