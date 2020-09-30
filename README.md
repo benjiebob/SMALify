@@ -17,7 +17,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
     
 2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d)
 
-3. Clone the [SMALST](https://github.com/silviazuffi/smalst) project website in order to access the latest version of the SMAL deformable animal model. You should copy all of [these files](https://github.com/silviazuffi/smalst/tree/master/smpl_models) underneath a CreaturesGreatAndSMAL/data/smal directory. 
+3. Clone the [SMALST](https://github.com/silviazuffi/smalst) project website in order to access the latest version of the SMAL deformable animal model. You should copy all of [these files](https://github.com/silviazuffi/smalst/tree/master/smpl_models) underneath a SMALify/data/smal directory. 
 
    Windows tip: If you are a Windows user, you can use these files but you'll need to edit the line endings. Try the following Powershell commands, shown here on one example:
      ```
@@ -36,7 +36,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
    unzip badja_extra_videos.zip
    ```
 
-5. Inspect the directory paths in config.py and make sure they match your system.
+6. Inspect the directory paths in config.py and make sure they match your system.
 
 ## QuickStart: Running the Fitter
 
@@ -56,7 +56,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
          | .ply  | Mesh file, can be viewed in e.g. [MeshLab](https://www.meshlab.net/)  |
          | .pkl  | Pickle file, contains the latest model/camera parameters |
 
-   - Once completed, generate a video visualization
+   - Optionally, generate a video visualization
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
       - Run the video generation script, which exports the video to CreaturesGreatAndSMAL/exported
          ```
@@ -77,13 +77,16 @@ The aim of this repository is to provide code for users to derive full 3D recons
 ### Tutorial Notes and Conventions
 #### Running other BADJA/StanfordExtra sequences:
 - Open the config.py file and make the following changes
-   1. Change the SEQUENCE_OR_IMAGE_NAME to "DATASET:SEQUENCE_NAME"
-   2. Change the SHAPE_FAMILY # Choose from Cat (e.g. House Cat/Tiger/Lion), Canine (e.g. Dog/Wolf)
-   3. Check the IMAGE_RANGE. # Frames to process from sequence. Ignored for stanford extra
-   4. Check the WINDOW_SIZE. For video sequences, this is the number of frames to fit into a batch.
 
+   | Config Setting  | Explanation | Example |
+   | ------------- | ------------- | ------------- |
+   | SEQUENCE_OR_IMAGE_NAME  | Used to refer to your sequence/image  | badja:rs_dog
+   | SHAPE_FAMILY            | Choose from 0: Cat, 1: Canine (e.g. Dog), 2: Equine (e.g. Horse), 3: Bovine (e.g. Cow), 4: Hippo |  1 |
+   | IMAGE_RANGE  | Number of frames to process from the sequence. Ignored for StanfordExtra.  | [1,2,3] or range(0, 10) |
+   | WINDOW_SIZE  | For video sequences, the number of frames to fit into a batch | 10 |
+   
 #### Running on your own data
-The first job is to source keypoint/silhouette data for your input images. 
+The first job is to generate keypoint/silhouette data for your input image(s). 
 
 - Manual Annotation
    - I recommend using [LabelMe](https://github.com/wkentaro/labelme), which is fantastic software that makes annotating keypoints / silhouettes efficient.
