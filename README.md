@@ -1,5 +1,7 @@
 WARNING: This respository is still in beta and under active development! I am bringing this up to speed in my free moments, but for now, please use at your own risk. If you find there's something not working properly, it's worth doing a quick git pull to see if I've fixed it :)
 
+<img src="docs/smal_viewer.gif">
+
 # SMALify
 This repository contains a implementation for performing 3D animal (quadruped) reconstruction from a monocular image or video. The system adapts the pose (limb positions) and shape (animal type/height/weight) parameters for the SMAL deformable quadruped model, as well as camera parameters until the projected SMAL model aligns with 2D keypoints and silhouette segmentations extracted from the input frame(s).
 
