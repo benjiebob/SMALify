@@ -103,7 +103,18 @@ The first job is to generate keypoint/silhouette data for your input image(s).
    - TODO: Release model for dog keypoint prediction, trained on StanfordExtra.
 - Automatic Quadruped Joint Predictor
    - TODO: Release training/testing scripts for CreaturesGreatAndSMAL joint prediction, trained on synthetic SMAL renders, OJA methods etc.
-   
+### Improving performance and general tips and tricks
+- For some sequences, it may be necessary to fiddle with the weights applied to each part of the loss function. By default the following losses are used:
+
+| Loss Component  | Explanation | Tips
+| ------------- | ------------- | ------------- |
+| 2D Keypoint Reprojection  | Project the SMAL model with latest parameters and compare projected joints to input 2D keypoints | If your model limbs don't match well with the input keypoints after fitting, it may be worth increasing this. |
+| 3D Shape Prior | Used to constrain the 3D shapes to be 'animal-like'. Note that (unlike equivalent human approaches that use mocap etc.) only artist data is used for this. | If your reconstructed animals don't look like animals, try increasing this. |
+| 3D Pose Prior  | Used to contains the 3D poses to be anatomically plausible. | If your reconstructed animals have limb configurations which are very unreasonable, e.g. legs in strange places, try increasing this. |
+| 2D Silhouette Loss  | Project the SMAL model with latest parameters and compare rendered silhouette to input 2D silhouette. | If the shape of your reconstructed animal doesn't match well (e.g. maybe it's too thin?), try increasing this. |
+
+Note that to avoid poor local minima, the optimization proceeds over multiple stages and the weights vary at each stage. For example, only once an approximate camera location has been found should there be 2D joint loss, and only once an approximate set of limb positions have been found should there be a 2D silhouette loss.
+
 ### Acknowledgements
 This repository owes a great deal to the following works and authors:
 - [SMAL](http://smal.is.tue.mpg.de/); Zuffi et al. designed the SMAL deformable quadruped template model and have been wonderful for providing advice throughout my animal reconstruction PhD journey.
