@@ -57,7 +57,7 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = config.GPU_IDS
 
     if not os.path.exists(config.OUTPUT_DIR):
-        os.mkdir(config.OUTPUT_DIR)
+        os.makedirs(config.OUTPUT_DIR)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 

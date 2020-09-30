@@ -43,7 +43,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
 - Run on a sample video from the [BADJA](https://github.com/benjiebob/BADJA) dataset.
    - Run the python script
       ```
-      python optimize_to_joints.py
+      python smal_fitter/optimize_to_joints.py
       ```
    - Inspect the SMALify/checkpoint directory to inspect the progress of the fitter. 
       - The output files stX_epY means, stage X and iteration Y of the fitter.
@@ -60,7 +60,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
       - Run the video generation script, which exports the video to CreaturesGreatAndSMAL/exported
          ```
-         python generate_video.py
+         python smal_fitter/generate_video.py
          ```
 - Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
    - Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
