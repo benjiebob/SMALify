@@ -82,8 +82,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
       ```
    - Run the python script:
       ```
-      cd smal_fitter
-      python optimize_to_joints.py
+      python smal_fitter/optimize_to_joints.py
       ```
 ## Running on alternative data
 ### Alternative BADJA/StanfordExtra sequences:
