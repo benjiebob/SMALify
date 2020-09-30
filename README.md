@@ -106,7 +106,7 @@ The first job is to generate keypoint/silhouette data for your input image(s).
 ## Improving performance and general tips and tricks
 - For some sequences, it may be necessary to fiddle with the weights applied to each part of the loss function. These are defined in config.py in an OPT_WEIGHTS settings. The values weight the following loss components:
 
-| Loss Component  | Explanation | Tips
+| Loss Component  | Explanation | Tips for Loss Weight
 | ------------- | ------------- | ------------- |
 | 2D Keypoint Reprojection  | Project the SMAL model with latest parameters and compare projected joints to input 2D keypoints | If your model limbs don't match well with the input keypoints after fitting, it may be worth increasing this. |
 | 3D Shape Prior | Used to constrain the 3D shapes to be 'animal-like'. Note that (unlike equivalent human approaches that use mocap etc.) only artist data is used for this. | If your reconstructed animals don't look like animals, try increasing this. |
