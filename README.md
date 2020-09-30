@@ -1,7 +1,7 @@
 WARNING: This respository is still in beta! I am bringing this up to speed in my free moments, but for now, please use at your own risk :)
 
 # SMALify
-This repository contains a implementation for performing 3D animal (quadruped) reconstruction from a monocular image or video. The system adapts the pose (limb positions) and shape (animal type/height weight) parameters for the SMAL deformable quadruped model, as well as camera parameters until the projected SMAL model aligns with 2D keypoints and silhouette segmentations extracted from the input frame(s).
+This repository contains a implementation for performing 3D animal (quadruped) reconstruction from a monocular image or video. The system adapts the pose (limb positions) and shape (animal type/height/weight) parameters for the SMAL deformable quadruped model, as well as camera parameters until the projected SMAL model aligns with 2D keypoints and silhouette segmentations extracted from the input frame(s).
 
 The code can be thought of as a modernization of the fitting code used in [Creatures Great and SMAL](https://arxiv.org/abs/1811.05804) paper; Chainer/ChumPy has been replaced with PyTorch, OpenDR replaced with PyTorch3D etc. However, I have also included some recent innovations from the [Who Left the Dogs Out?](https://arxiv.org/abs/2007.11110) such as the inclusion of limb scaling parameters, and an improved shape prior.
 
