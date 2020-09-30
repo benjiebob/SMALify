@@ -43,6 +43,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
 ## QuickStart: Running the Fitter
 
 - Run on a sample video from the [BADJA](https://github.com/benjiebob/BADJA) dataset.
+      <img src="docs/badja_opt.gif">
    - Run the python script
       ```
       python smal_fitter/optimize_to_joints.py
@@ -58,8 +59,6 @@ The aim of this repository is to provide code for users to derive full 3D recons
          | .ply  | Mesh file, can be viewed in e.g. [MeshLab](https://www.meshlab.net/)  |
          | .pkl  | Pickle file, contains the latest model/camera parameters |
 
-<img src="docs/badja_opt.gif">
-
    - Create a video with the final fits
       - The generate_video.py function loads the exported .pkl files generated during the fitting process and exports the data. This is generally usful if your .pkl files are created using alternative methods, e.g. Who Left the Dogs Out? (coming soon!) or your own research. 
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in SMALify/checkpoints
@@ -74,6 +73,8 @@ The aim of this repository is to provide code for users to derive full 3D recons
          ffmpeg -framerate 2 -pattern_type glob -i '*.png' -pix_fmt yuv420p results.mp4
          ```
 - Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
+
+      <img src="docs/stanfordextra_opt.gif">
    - Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
       ```
       # SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
@@ -84,9 +85,6 @@ The aim of this repository is to provide code for users to derive full 3D recons
       cd smal_fitter
       python optimize_to_joints.py
       ```
-
-   <img src="docs/stanfordextra_opt.gif">
-
 ## Running on alternative data
 ### Alternative BADJA/StanfordExtra sequences:
 - Open the config.py file and make the following changes
