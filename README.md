@@ -46,11 +46,19 @@ The aim of this repository is to provide code for users to derive full 3D recons
       python optimize_to_joints.py
       ```
    - Inspect the SMALify/checkpoint directory to inspect the progress of the fitter. 
-      - The final output is named st10_ep0.* by convention. 
-      - At each stage the .png contains a image visualization, .ply is a mesh file (can be viewed in [MeshLab](https://www.meshlab.net/) for example), .pkl is a pickle file containing the model/camera parameters.
+      - The output files stX_epY means, stage X and iteration Y of the fitter.
+      - The final output is named st10_ep0 by (a slightly lazy) convention. 
+      - The other files have the following meaning
+
+      | Extension  | Explanation |
+      | ------------- | ------------- |
+      | .png  | Image Visualization  |
+      | .ply  | Mesh file, can be viewed in e.g. [MeshLab](https://www.meshlab.net/)  |
+      | .pkl  | Pickle file, contains the latest model/camera parameters |
+
    - Once completed, generate a video visualization
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
-      - Run the video generation script, which exports to CreaturesGreatAndSMAL/exported
+      - Run the video generation script, which exports the video to CreaturesGreatAndSMAL/exported
          ```
          python generate_video.py
          ```
@@ -68,6 +76,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
 
 ### Tutorial Notes and Conventions
 #### Running other BADJA/StanfordExtra sequences:
+- Open the config.py file and make the following changes
    1. Change the SEQUENCE_OR_IMAGE_NAME to "DATASET:SEQUENCE_NAME"
    2. Change the SHAPE_FAMILY # Choose from Cat (e.g. House Cat/Tiger/Lion), Canine (e.g. Dog/Wolf)
    3. Check the IMAGE_RANGE. # Frames to process from sequence. Ignored for stanford extra
