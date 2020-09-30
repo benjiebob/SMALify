@@ -58,7 +58,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
 
    - Generate fits for the video
       - The generate_video.py function loads the exported .pkl files generated during the fitting process and exports the data. This is generally usful if your pkl files are created using alternative methods, e.g. Who Left the Dogs Out? (coming soon!) or your own research. 
-      - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
+      - Set CHECKPOINT_NAME in config.py to be the name of the output directory in SMALify/checkpoints
       - By default the code will load the final optimized meshes, indicated by EPOCH_NAME = "st10_ep0". If you want to generate a video from intermediate results, set this to some different stage/iteration. 
       - Run the video generation script, which exports the video to SMALify/exported
          ```
