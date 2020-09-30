@@ -50,11 +50,11 @@ The aim of this repository is to provide code for users to derive full 3D recons
       - The final output is named st10_ep0 by (a slightly lazy) convention. 
       - The other files have the following meaning
 
-      | Extension  | Explanation |
-      | ------------- | ------------- |
-      | .png  | Image Visualization  |
-      | .ply  | Mesh file, can be viewed in e.g. [MeshLab](https://www.meshlab.net/)  |
-      | .pkl  | Pickle file, contains the latest model/camera parameters |
+         | Extension  | Explanation |
+         | ------------- | ------------- |
+         | .png  | Image Visualization  |
+         | .ply  | Mesh file, can be viewed in e.g. [MeshLab](https://www.meshlab.net/)  |
+         | .pkl  | Pickle file, contains the latest model/camera parameters |
 
    - Once completed, generate a video visualization
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
