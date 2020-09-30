@@ -11,7 +11,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
 1. Clone the repository **with submodules** and enter directory
    ```
    git clone --recurse-submodules https://github.com/benjiebob/SMALify
-   cd CreaturesGreatAndSMAL
+   cd SMALify
    ```
    Note: If you don't clone with submodules you won't get the sample data from BADJA/StanfordExtra.
     
