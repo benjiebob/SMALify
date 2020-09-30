@@ -74,8 +74,8 @@ The aim of this repository is to provide code for users to derive full 3D recons
       python optimize_to_joints.py
       ```
 
-### Tutorial Notes and Conventions
-#### Running other BADJA/StanfordExtra sequences:
+## Running on alternative data
+### Alternative BADJA/StanfordExtra sequences:
 - Open the config.py file and make the following changes
 
    | Config Setting  | Explanation | Example |
@@ -83,9 +83,9 @@ The aim of this repository is to provide code for users to derive full 3D recons
    | SEQUENCE_OR_IMAGE_NAME  | Used to refer to your sequence/image  | badja:rs_dog
    | SHAPE_FAMILY            | Choose from 0: Cat, 1: Canine (e.g. Dog), 2: Equine (e.g. Horse), 3: Bovine (e.g. Cow), 4: Hippo |  1 |
    | IMAGE_RANGE  | Number of frames to process from the sequence. Ignored for StanfordExtra.  | [1,2,3] or range(0, 10) |
-   | WINDOW_SIZE  | For video sequences, the number of frames to fit into a batch | 10 |
+   | WINDOW_SIZE  | For video sequences, the number of frames to fit into a batch. Alter depending on GPU capacity. | 10 |
    
-#### Running on your own data
+### Running on your own data
 The first job is to generate keypoint/silhouette data for your input image(s). 
 
 - Manual Annotation
@@ -99,13 +99,13 @@ The first job is to generate keypoint/silhouette data for your input image(s).
       # TODO
       ```
    - TODO: Write script to load labelme files
-- StanfordExtra Joint Prediction
-   - TODO: Release model for dog keypoint prediction, trained on StanfordExtra
-- CreaturesGreatAndSMAL (CGAS) Joint Prediction
-   - TODO: Release training/testing scripts for CreaturesGreatAndSMAL joint prediction, OJA methods etc.
-
+- Automatic Dog Joint Predictor
+   - TODO: Release model for dog keypoint prediction, trained on StanfordExtra.
+- Automatic Quadruped Joint Predictor
+   - TODO: Release training/testing scripts for CreaturesGreatAndSMAL joint prediction, trained on synthetic SMAL renders, OJA methods etc.
+   
 ### Acknowledgements
-This repository owes a great deal to the following works:
+This repository owes a great deal to the following works and authors:
 - [SMAL](http://smal.is.tue.mpg.de/); Zuffi et al. designed the SMAL deformable quadruped template model and have been wonderful for providing advice throughout my animal reconstruction PhD journey.
 - [SMPLify](http://smplify.is.tue.mpg.de/); Bogo et al. provided the basis for our original ChumPY implementation and inspired the name of this repo.
 - [SMALST] (https://github.com/silviazuffi/smalst); Zuffi et al. provided a PyTorch implementations of the SMAL skinning functions which have been used here.
