@@ -27,7 +27,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
 
    For more information, check out the StackOverflow answer [here](https://stackoverflow.com/questions/19127741/replace-crlf-using-powershell)
 
-4. Download [SMPL](https://smpl.is.tue.mpg.de/) and create a smpl_webuser directory underneath CreaturesGreatAndSMAL/smal_model
+4. Download [SMPL](https://smpl.is.tue.mpg.de/) and create a smpl_webuser directory underneath SMALify/smal_model
 
 5. Download images corresponding to demo BADJA sequence
    ```
