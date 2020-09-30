@@ -85,7 +85,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
    | IMAGE_RANGE  | Number of frames to process from the sequence. Ignored for StanfordExtra.  | [1,2,3] or range(0, 10) |
    | WINDOW_SIZE  | For video sequences, the number of frames to fit into a batch. Alter depending on GPU capacity. | 10 |
    
-### Running on your own data
+### Running on your own data (TODO... Ben working on this now!)
 The first job is to generate keypoint/silhouette data for your input image(s). 
 
 - Manual Annotation
