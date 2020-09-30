@@ -45,7 +45,10 @@ The aim of this repository is to provide code for users to derive full 3D recons
       ```
       python optimize_to_joints.py
       ```
-   - OPTIONAL: Generate a video visualization
+   - Inspect the SMALify/checkpoint directory to inspect the progress of the fitter. 
+      - The final output is named st10_ep0.* by convention. 
+      - At each stage the .png contains a image visualization, .ply is a mesh file (can be viewed in [MeshLab](https://www.meshlab.net/) for example), .pkl is a pickle file containing the model/camera parameters.
+   - Once completed, generate a video visualization
       - Set CHECKPOINT_NAME in config.py to be the name of the output directory in CreaturesGreatAndSMAL/checkpoints
       - Run the video generation script, which exports to CreaturesGreatAndSMAL/exported
          ```
