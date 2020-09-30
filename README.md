@@ -10,14 +10,14 @@ The aim of this repository is to provide code for users to derive full 3D recons
 ## Installation
 1. Clone the repository **with submodules** and enter directory
    ```
-   git clone --recurse-submodules https://github.com/benjiebob/CreaturesGreatAndSMAL
+   git clone --recurse-submodules https://github.com/benjiebob/SMALify
    cd CreaturesGreatAndSMAL
    ```
    Note: If you don't clone with submodules you won't get the sample data from BADJA/StanfordExtra.
     
 2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d)
 
-3. Clone the [SMAL-ST](http://smal.is.tue.mpg.de/) project website in order to access the latest version of the SMAL deformable animal model. You should copy all of [these files](https://github.com/silviazuffi/smalst/tree/master/smpl_models) underneath a CreaturesGreatAndSMAL/data/smal directory. 
+3. Clone the [SMALST](https://github.com/silviazuffi/smalst) project website in order to access the latest version of the SMAL deformable animal model. You should copy all of [these files](https://github.com/silviazuffi/smalst/tree/master/smpl_models) underneath a CreaturesGreatAndSMAL/data/smal directory. 
 
    Windows tip: If you are a Windows user, you can use these files but you'll need to edit the line endings. Try the following Powershell commands, shown here on one example:
      ```
@@ -92,7 +92,8 @@ The first job is to source keypoint/silhouette data for your input images.
 ### Acknowledgements
 This repository owes a great deal to the following works:
 - [SMAL](http://smal.is.tue.mpg.de/); Zuffi et al. designed the SMAL deformable quadruped template model and have been wonderful for providing advice throughout my animal reconstruction PhD journey.
-- [SMPLify](http://smplify.is.tue.mpg.de/); Bogo et al. provided the basis for our original ChumPY implementation
+- [SMPLify](http://smplify.is.tue.mpg.de/); Bogo et al. provided the basis for our original ChumPY implementation and inspired the name of this repo.
+- [SMALST] (https://github.com/silviazuffi/smalst); Zuffi et al. provided a PyTorch implementations of the SMAL skinning functions which have been used here.
 
 If you find this fitting code and/or BADJA dataset useful for your research, please consider citing the following paper:
 
@@ -118,3 +119,10 @@ if you make use of the limb scaling parameters, or Unity shape prior (on by defa
 
 ## Contribute
 Please create a pull request or submit an issue if you would like to contribute.
+
+## Licensing
+(c) Benjamin Biggs, Andrew Fitzgibbon and Roberto Cipolla. Department of Engineering, University of Cambridge 2020
+
+By downloading this code, you agree to the [Creative Commons Attribution 3.0 International license](https://creativecommons.org/licenses/by/3.0/). This license allows users to use, share and adapt the code, so long as credit is given to the authors (e.g. by citation).
+
+THIS SOFTWARE AND ANNOTATIONS ARE PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
