@@ -108,7 +108,7 @@ The first job is to generate keypoint/silhouette data for your input image(s).
 This repository owes a great deal to the following works and authors:
 - [SMAL](http://smal.is.tue.mpg.de/); Zuffi et al. designed the SMAL deformable quadruped template model and have been wonderful for providing advice throughout my animal reconstruction PhD journey.
 - [SMPLify](http://smplify.is.tue.mpg.de/); Bogo et al. provided the basis for our original ChumPY implementation and inspired the name of this repo.
-- [SMALST] (https://github.com/silviazuffi/smalst); Zuffi et al. provided a PyTorch implementations of the SMAL skinning functions which have been used here.
+- [SMALST](https://github.com/silviazuffi/smalst); Zuffi et al. provided a PyTorch implementations of the SMAL skinning functions which have been used here.
 
 If you find this fitting code and/or BADJA dataset useful for your research, please consider citing the following paper:
 
