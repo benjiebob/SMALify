@@ -1,7 +1,8 @@
 import os
 import pickle as pkl
 import numpy as np
-from smal_model.smpl_webuser.serialization import load_model
+import config
+# from smal_model.smpl_webuser.serialization import load_model
 
 def align_smal_template_to_symmetry_axis(v, sym_file):
     # These are the indexes of the points that are on the symmetry axis
@@ -12,9 +13,8 @@ def align_smal_template_to_symmetry_axis(v, sym_file):
     v[:,1] = v[:,1] - y
     v[I,1] = 0
 
-    sym_path = sym_file
     # symIdx = pkl.load(open(sym_path))
-    with open(sym_path, 'rb') as f:
+    with open(sym_file, 'rb') as f:
         u = pkl._Unpickler(f)
         u.encoding = 'latin1'
         symIdx = u.load()
@@ -36,31 +36,25 @@ def align_smal_template_to_symmetry_axis(v, sym_file):
 
     return v, left_inds, right_inds, center_inds
 
-def load_smal_model():
-    model = load_model(config.SMAL_FILE)
-    v = align_smal_template_to_symmetry_axis(model.r.copy())
+# Legacy
+# def get_smal_template(model_name, data_name, shape_family_id=-1):
+#     model = load_model(model_name)
+#     nBetas = len(model.betas.r)
 
-   
-    return v, model.f
+#     with open(data_name, 'rb') as f:
+#         u = pkl._Unpickler(f)
+#         u.encoding = 'latin1'
+#         data = u.load()
 
-def get_smal_template(model_name, data_name, shape_family_id=-1):
-    model = load_model(model_name)
-    nBetas = len(model.betas.r)
+#     # Select average zebra/horse
+#     # betas = data['cluster_means'][2][:nBetas]
+#     betas = data['cluster_means'][shape_family_id][:nBetas]
+#     model.betas[:] = betas
 
-    with open(data_name, 'rb') as f:
-        u = pkl._Unpickler(f)
-        u.encoding = 'latin1'
-        data = u.load()
+#     if shape_family_id == -1:
+#         model.betas[:] = np.zeros_like(betas)
 
-    # Select average zebra/horse
-    # betas = data['cluster_means'][2][:nBetas]
-    betas = data['cluster_means'][shape_family_id][:nBetas]
-    model.betas[:] = betas
-
-    if shape_family_id == -1:
-        model.betas[:] = np.zeros_like(betas)
-
-    v = model.r.copy()
-    return v
+#     v = model.r.copy()
+#     return v
 
 

@@ -24,14 +24,14 @@ IMAGE_RANGE = range(0, 10) # Frames to process from sequence. Ignored for stanfo
 WINDOW_SIZE = 10 # Changed number of frames processed in one go.
 
 # Generate video settings
-CHECKPOINT_NAME = "20200930-121001" # the directory to run
+CHECKPOINT_NAME = "20201001-125009" # the directory to run
 EPOCH_NAME = "st10_ep0" # convention used for the final output file. Don't change this without good reason.
 
 # SMAL
-SMAL_FILE = join(data_path, 'smal', 'my_smpl_00781_4_all.pkl')
-SMAL_DATA_FILE = join(data_path, 'smal', 'my_smpl_data_00781_4_all.pkl')
-SMAL_UV_FILE = join(data_path, 'smal', 'my_smpl_00781_4_all_template_w_tex_uv_001.pkl')
-SMAL_SYM_FILE = join(data_path, 'smal', 'symIdx.pkl')
+SMAL_FILE = join(data_path, 'SMALST', 'smpl_models', 'my_smpl_00781_4_all.pkl')
+SMAL_DATA_FILE = join(data_path, 'SMALST', 'smpl_models', 'my_smpl_data_00781_4_all.pkl')
+SMAL_UV_FILE = join(data_path, 'SMALST', 'smpl_models', 'my_smpl_00781_4_all_template_w_tex_uv_001.pkl')
+SMAL_SYM_FILE = join(data_path, 'SMALST', 'smpl_models', 'symIdx.pkl')
 
 # PRIORS
 WALKING_PRIOR_FILE = join(data_path, 'priors', 'walking_toy_symmetric_pose_prior_with_cov_35parts.pkl')
@@ -43,18 +43,7 @@ IMG_RES = 224
 # RENDERER
 MESH_COLOR = [0, 172, 223]
 
-# OPTIMIZER - You may
-# OPT_WEIGHTS = [
-#     [25.0, 10.0, 7.5, 5.0], # Joint
-#     [0.0, 0.0, 100.0, 250.0], # Sil Reproj
-#     [0.0, 100.0, 100.0, 100.0], # Betas
-#     [0.0, 10.0, 5.0, 1.0], # Pose
-#     [0.0, 100.0, 100.0, 100.0], # Limits TODO!
-#     [0.0, 0.1, 0.1, 0.1], # Splay
-#     [500.0, 100.0, 100.0, 100.0], # Temporal
-#     [300, 1000, 1000, 1000], # Num iterations
-#     [1e-2, 5e-3, 5e-3, 5e-3]] # Learning Rate
-
+# OPTIMIZER - You may need to adjust these depending on the sequence.
 OPT_WEIGHTS = [
     [25.0, 10.0, 7.5, 5.0], # Joint
     [0.0, 500.0, 5000.0, 5000.0], # Sil Reproj
@@ -65,7 +54,6 @@ OPT_WEIGHTS = [
     [500.0, 100.0, 100.0, 100.0], # Temporal
     [150, 400, 600, 800], # Num iterations
     [5e-3, 5e-3, 5e-4, 1e-4]] # Learning Rate
-
 
 # JOINT DEFINITIONS
 TORSO_JOINTS = [2, 5, 8, 11, 12, 23]

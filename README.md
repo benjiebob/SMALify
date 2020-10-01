@@ -4,11 +4,11 @@ WARNING: This respository is still in beta and under active development! I am br
 
 <img src="docs/badja_result.gif">
 
-This repository contains a implementation for performing 3D animal (quadruped) reconstruction from a monocular image or video. The system adapts the pose (limb positions) and shape (animal type/height/weight) parameters for the SMAL deformable quadruped model, as well as camera parameters until the projected SMAL model aligns with 2D keypoints and silhouette segmentations extracted from the input frame(s).
+This repository contains an implementation for performing 3D animal (quadruped) reconstruction from a monocular image or video. The system adapts the pose (limb positions) and shape (animal type/height/weight) parameters for the SMAL deformable quadruped model, as well as camera parameters until the projected SMAL model aligns with 2D keypoints and silhouette segmentations extracted from the input frame(s).
 
 The code can be thought of as a modernization of the fitting code used in [Creatures Great and SMAL](https://arxiv.org/abs/1811.05804) paper; Chainer/ChumPy has been replaced with PyTorch, OpenDR replaced with PyTorch3D etc. However, I have also included some recent innovations from the [Who Left the Dogs Out?](https://arxiv.org/abs/2007.11110) such as the inclusion of limb scaling parameters, and an improved shape prior.
 
-The aim of this repository is to provide code for users to derive full 3D reconstructions for their quadruped animal image sequences. My great hope is that this work can be of some benefit to those working closely to animal science; I'd be delighted to hear from you if this is the case!
+The aim of this repository is to provided demonstrative fitting code to benefit comptuer vision researchers but also those working in animal science. In either case, I'd be delighted to hear from you!
 
 ## Installation
 1. Clone the repository **with submodules** and enter directory
@@ -18,28 +18,16 @@ The aim of this repository is to provide code for users to derive full 3D recons
    ```
    Note: If you don't clone with submodules you won't get the sample data from BADJA/StanfordExtra.
     
-2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d)
+2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d). Check requirements.txt for full details.
 
-3. Clone the [SMALST](https://github.com/silviazuffi/smalst) project website in order to access the latest version of the SMAL deformable animal model. You should copy all of [these files](https://github.com/silviazuffi/smalst/tree/master/smpl_models) underneath a SMALify/data/smal directory. 
-
-   Windows tip: If you are a Windows user, you can use these files but you'll need to edit the line endings. Try the following Powershell commands, shown here on one example:
-     ```
-     $path="my_smpl_00781_4_all_template_w_tex_uv_001.pkl"
-     (Get-Content $path -Raw).Replace("`r`n","`n") | Set-Content $path -Force
-     ```
-
-   For more information, check out the StackOverflow answer [here](https://stackoverflow.com/questions/19127741/replace-crlf-using-powershell)
-
-4. Download [SMPL](https://smpl.is.tue.mpg.de/) and create a smpl_webuser directory underneath SMALify/smal_model
-
-5. Download images corresponding to demo BADJA sequence
+3. Download images corresponding to demo BADJA sequence
    ```
    cd data/BADJA
    wget http://mi.eng.cam.ac.uk/~bjb56/datasets/badja_extra_videos.zip
    unzip badja_extra_videos.zip
    ```
 
-6. Inspect the directory paths in config.py and make sure they match your system.
+4. Inspect the directory paths in config.py and make sure they match your system.
 
 ## QuickStart: Running the Fitter
 
@@ -62,7 +50,7 @@ The aim of this repository is to provide code for users to derive full 3D recons
 
    - Create a video with the final fits
       - The generate_video.py function loads the exported .pkl files generated during the fitting process and exports the data. This is generally usful if your .pkl files are created using alternative methods, e.g. Who Left the Dogs Out? (coming soon!) or your own research. 
-      - Set CHECKPOINT_NAME in config.py to be the name of the output directory in SMALify/checkpoints
+      - Set CHECKPOINT_NAME in config.py to be the name of the output directory in SMALify/checkpoints.
       - By default the code will load the final optimized meshes, indicated by EPOCH_NAME = "st10_ep0". If you want to generate a video from intermediate results, set this to some different stage/iteration. 
       - Run the video generation script, which exports the video to SMALify/exported
          ```

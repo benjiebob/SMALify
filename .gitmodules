@@ -4,3 +4,6 @@
 [submodule "data/StanfordExtra"]
 	path = data/StanfordExtra
 	url = https://github.com/benjiebob/StanfordExtra
+[submodule "data/SMALST"]
+	path = data/SMALST
+	url = https://github.com/silviazuffi/smalst

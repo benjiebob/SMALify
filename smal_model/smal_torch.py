@@ -12,7 +12,7 @@ import torch
 from torch.autograd import Variable
 import pickle as pkl 
 from .batch_lbs import batch_rodrigues, batch_global_rigid_transformation
-from .smal_basics import align_smal_template_to_symmetry_axis, get_smal_template
+from .smal_basics import align_smal_template_to_symmetry_axis #, get_smal_template
 import torch.nn as nn
 import config
 
@@ -37,20 +37,16 @@ class SMAL(nn.Module):
 
         self.faces = torch.from_numpy(self.f.astype(int)).to(device)
 
-        v_template = get_smal_template(
-            model_name=config.SMAL_FILE, 
-            data_name=config.SMAL_DATA_FILE, 
-            shape_family_id=shape_family_id)
+        # replaced logic in here (which requried SMPL library with L58-L68)
+        # v_template = get_smal_template(
+        #     model_name=config.SMAL_FILE, 
+        #     data_name=config.SMAL_DATA_FILE, 
+        #     shape_family_id=shape_family_id)
 
-        v, self.left_inds, self.right_inds, self.center_inds = align_smal_template_to_symmetry_axis(
-            v_template, sym_file=config.SMAL_SYM_FILE)
+        v_template = dd['v_template']
 
-        # Mean template vertices
-        self.v_template = Variable(
-            torch.Tensor(v),
-            requires_grad=False).to(device)
         # Size of mesh [Number of vertices, 3]
-        self.size = [self.v_template.shape[0], 3]
+        self.size = [v_template.shape[0], 3]
         self.num_betas = dd['shapedirs'].shape[-1]
         # Shape blend shape basis
         
@@ -58,6 +54,25 @@ class SMAL(nn.Module):
             undo_chumpy(dd['shapedirs']), [-1, self.num_betas]).T
         self.shapedirs = Variable(
             torch.Tensor(shapedir), requires_grad=False).to(device)
+
+        if shape_family_id != -1:
+            with open(config.SMAL_DATA_FILE, 'rb') as f:
+                u = pkl._Unpickler(f)
+                u.encoding = 'latin1'
+                data = u.load()
+
+            # Select mean shape for quadruped type
+            betas = data['cluster_means'][shape_family_id]
+            v_template = v_template + np.matmul(betas[None,:], shapedir).reshape(
+                -1, self.size[0], self.size[1])[0]
+
+        v_sym, self.left_inds, self.right_inds, self.center_inds = align_smal_template_to_symmetry_axis(
+            v_template, sym_file=config.SMAL_SYM_FILE)
+
+        # Mean template vertices
+        self.v_template = Variable(
+            torch.Tensor(v_sym),
+            requires_grad=False).to(device)
 
         # Regressor for joint locations given shape 
         self.J_regressor = Variable(
@@ -80,7 +95,8 @@ class SMAL(nn.Module):
             torch.Tensor(undo_chumpy(dd['weights'])),
             requires_grad=False).to(device)
 
-    def __call__(self, beta, theta, trans=None, del_v=None, betas_logscale=None, get_skin=True):
+
+    def __call__(self, beta, theta, trans=None, del_v=None, betas_logscale=None, get_skin=True, v_template=None):
 
         if True:
             nBetas = beta.shape[1]
@@ -89,7 +105,9 @@ class SMAL(nn.Module):
 
         
         # v_template = self.v_template.unsqueeze(0).expand(beta.shape[0], 3889, 3)
-        v_template = self.v_template
+        if v_template is None:
+            v_template = self.v_template
+
         # 1. Add shape blend shapes
         
         if nBetas > 0:
