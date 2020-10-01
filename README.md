@@ -18,7 +18,7 @@ The aim of this repository is to provided demonstrative fitting code to benefit 
    ```
    Note: If you don't clone with submodules you won't get the sample data from BADJA/StanfordExtra.
     
-2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d). Check [requirements.txt](https://github.com/benjiebob/SMALify/blob/master/requirements.txt) for full details.
+2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d). Check requirements.txt for full details.
 
 3. Download images corresponding to demo BADJA sequence
    ```
@@ -50,7 +50,7 @@ The aim of this repository is to provided demonstrative fitting code to benefit 
 
    - Create a video with the final fits
       - The generate_video.py function loads the exported .pkl files generated during the fitting process and exports the data. This is generally usful if your .pkl files are created using alternative methods, e.g. Who Left the Dogs Out? (coming soon!) or your own research. 
-      - Set CHECKPOINT_NAME in config.py to be the name of the output directory in SMALify/checkpoints.
+      - Set CHECKPOINT_NAME in [config.py](https://github.com/benjiebob/SMALify/blob/master/config.py) to be the name of the output directory in SMALify/checkpoints.
       - By default the code will load the final optimized meshes, indicated by EPOCH_NAME = "st10_ep0". If you want to generate a video from intermediate results, set this to some different stage/iteration. 
       - Run the video generation script, which exports the video to SMALify/exported
          ```
@@ -63,7 +63,7 @@ The aim of this repository is to provided demonstrative fitting code to benefit 
          ```
 - Fit to an image from [StanfordExtra](https://github.com/benjiebob/StanfordExtra) dataset.
    <img src="docs/stanfordextra_opt.gif">
-   - Edit the config.py file to make load a StanfordExtra image instead of a BADJA video sequence:
+   - Edit the [config.py](https://github.com/benjiebob/SMALify/blob/master/config.py) file to make load a StanfordExtra image instead of a BADJA video sequence:
       ```
       # SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
       SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02099601-golden_retriever/n02099601_176.jpg"
@@ -74,7 +74,8 @@ The aim of this repository is to provided demonstrative fitting code to benefit 
       ```
 ## Running on alternative data
 ### Alternative BADJA/StanfordExtra sequences:
-- Open the config.py file and make the following changes
+- Follow the instructions for [BADJA](https://github.com/benjiebob/BADJA) or [StanfordExtra](https://github.com/benjiebob/StanfordExtra).
+- Open the [config.py](https://github.com/benjiebob/SMALify/blob/master/config.py) file and make the following changes
 
    | Config Setting  | Explanation | Example |
    | ------------- | ------------- | ------------- |
@@ -102,7 +103,7 @@ The first job is to generate keypoint/silhouette data for your input image(s).
 - Automatic Quadruped Joint Predictor
    - TODO: Release training/testing scripts for CreaturesGreatAndSMAL joint prediction, trained on synthetic SMAL renders, OJA methods etc.
 ## Improving performance and general tips and tricks
-- For some sequences, it may be necessary to fiddle with the weights applied to each part of the loss function. These are defined in config.py in an OPT_WEIGHTS settings. The values weight the following loss components:
+- For some sequences, it may be necessary to fiddle with the weights applied to each part of the loss function. These are defined in [config.py](https://github.com/benjiebob/SMALify/blob/master/config.py) in an OPT_WEIGHTS settings. The values weight the following loss components:
 
 | Loss Component  | Explanation | Tips for Loss Weight
 | ------------- | ------------- | ------------- |
