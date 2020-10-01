@@ -18,7 +18,7 @@ The aim of this repository is to provided demonstrative fitting code to benefit 
    ```
    Note: If you don't clone with submodules you won't get the sample data from BADJA/StanfordExtra.
     
-2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d). Check requirements.txt for full details.
+2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d). Check [requirements.txt](https://github.com/benjiebob/SMALify/blob/master/requirements.txt) for full details.
 
 3. Download images corresponding to demo BADJA sequence
    ```
