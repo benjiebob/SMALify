@@ -8,7 +8,7 @@ This repository contains an implementation for performing 3D animal (quadruped) 
 
 The code can be thought of as a modernization of the fitting code used in [Creatures Great and SMAL](https://arxiv.org/abs/1811.05804) paper; Chainer/ChumPy has been replaced with PyTorch, OpenDR replaced with PyTorch3D etc. However, I have also included some recent innovations from the [Who Left the Dogs Out?](https://arxiv.org/abs/2007.11110) such as the inclusion of limb scaling parameters, and an improved shape prior.
 
-The aim of this repository is to provided demonstrative fitting code to benefit comptuer vision researchers but also those working in animal science. In either case, I'd be delighted to hear from you!
+The aim of this repository is to provided demonstrative fitting code to benefit computer vision researchers but also those working in animal/veterinary science. In either case, I'd be delighted to hear from you!
 
 ## Installation
 1. Clone the repository **with submodules** and enter directory
@@ -16,7 +16,7 @@ The aim of this repository is to provided demonstrative fitting code to benefit 
    git clone --recurse-submodules https://github.com/benjiebob/SMALify
    cd SMALify
    ```
-   Note: If you don't clone with submodules you won't get the sample data from BADJA/StanfordExtra.
+   Note: If you don't clone with submodules you won't get the sample data from BADJA/StanfordExtra/SMALST.
     
 2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d). Check [requirements.txt](https://github.com/benjiebob/SMALify/blob/master/requirements.txt) for full details.
 
