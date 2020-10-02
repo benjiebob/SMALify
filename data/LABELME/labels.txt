@@ -1,15 +1,15 @@
-Left front leg
-Left front leg
-Left front leg
-Left rear leg
-Left rear leg
-Left rear leg
-Right front leg
-Right front leg
-Right front leg
-Right rear leg
-Right rear leg
-Right rear leg
+Left front leg: paw
+Left front leg: middle joint
+Left front leg: top
+Left rear leg: paw
+Left rear leg: middle joint
+Left rear leg: top
+Right front leg: paw
+Right front leg: middle joint
+Right front leg: top
+Right rear leg: paw
+Right rear leg: middle joint
+Right rear leg: top
 Tail start
 Tail end
 Base of left ear
