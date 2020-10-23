@@ -1,7 +1,5 @@
 """Introduces Stage class - representing a Stage of optimising a batch of SMBLD meshes to target meshes"""
 
-import sys
-sys.path.append(r'D:\\repos\\animal_fitting\\SMALify')
 
 from pytorch3d.ops import sample_points_from_meshes
 from pytorch3d.loss import (
@@ -111,42 +109,7 @@ class SMAL3DFitter(nn.Module):
 
 		return verts
 
-class StageManager:
-	"""Container for multiple stages of optimisation"""
 
-	def __init__(self, out_dir="static_fits_output", labels=None):
-		"""Labels: optional list of size n_batch with labels for each mesh"""
-		self.stages = []
-		self.out_dir = out_dir
-		self.labels = labels
-
-	def run(self):
-		for n, stage in enumerate(self.stages):
-			stage.run(plot=True)
-			stage.save_npz(labels=self.labels)
-
-		self.plot_losses()
-
-	def plot_losses(self, out_src="losses"):
-		"""Plot combined losses for all stages."""
-
-		fig, ax = plt.subplots()
-		it_start = 0  # track number of its
-		for stage in self.stages:
-			n_it = stage.n_it
-			ax.semilogy(np.arange(it_start, it_start + n_it), stage.losses_to_plot, label=stage.name)
-			it_start += n_it
-
-		ax.set_xlabel('Epoch')
-		ax.set_ylabel('Total loss')
-		ax.legend()
-		out_src = os.path.join(self.out_dir, out_src + ".png")
-		plt.tight_layout()
-		fig.savefig(out_src)
-		plt.close(fig)
-
-	def add_stage(self, stage):
-		self.stages.append(stage)
 
 
 class SMALParamGroup:
@@ -321,3 +284,41 @@ class Stage:
 
 		out_title = f"{self.name}.npz"
 		np.savez(os.path.join(self.out_dir, out_title), **out)
+
+
+class StageManager:
+	"""Container for multiple stages of optimisation"""
+
+	def __init__(self, out_dir="static_fits_output", labels=None):
+		"""Labels: optional list of size n_batch with labels for each mesh"""
+		self.stages = []
+		self.out_dir = out_dir
+		self.labels = labels
+
+	def run(self):
+		for n, stage in enumerate(self.stages):
+			stage.run(plot=True)
+			stage.save_npz(labels=self.labels)
+
+		self.plot_losses()
+
+	def plot_losses(self, out_src="losses"):
+		"""Plot combined losses for all stages."""
+
+		fig, ax = plt.subplots()
+		it_start = 0  # track number of its
+		for stage in self.stages:
+			n_it = stage.n_it
+			ax.semilogy(np.arange(it_start, it_start + n_it), stage.losses_to_plot, label=stage.name)
+			it_start += n_it
+
+		ax.set_xlabel('Epoch')
+		ax.set_ylabel('Total loss')
+		ax.legend()
+		out_src = os.path.join(self.out_dir, out_src + ".png")
+		plt.tight_layout()
+		fig.savefig(out_src)
+		plt.close(fig)
+
+	def add_stage(self, stage):
+		self.stages.append(stage)
