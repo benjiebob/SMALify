@@ -24,3 +24,8 @@ stages:
     scheme: 'default'
     nits: 1000
     lr: 0.015
+
+# Custom arguments. These will *overwrite* any command line arguments passed into the script
+args:
+  results_dir: fit3d_results
+  shape_family_id: 1

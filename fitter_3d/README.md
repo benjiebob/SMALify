@@ -19,9 +19,11 @@ Two options to run an optimisation:
 
 `python fitter_3d/optimise.py --mesh_dir example_meshes --scheme default --lr 1e-3 --nits 100`
 
-- For a more complicated (eg multi-stage) and fine tuned optimisation, add a custom .yaml file. See example_scheme.yaml for how it must be organised. This can then be called in optimise.py using:
+- For a more complicated (eg multi-stage) and fine tuned optimisation, add a custom .yaml file. See example_cfg.yaml for how it must be organised. This can then be called in optimise.py using:
 
-`python fitter_3d/optimise.py --mesh_dir example_meshes --yaml_src fitter_3d/example_scheme.yaml`
+`python fitter_3d/optimise.py --mesh_dir example_meshes --yaml_src fitter_3d/example_cfg.yaml`
+
+Note: Any args provided in example_cfg.yaml will overwrite args provided at the command line.
 
 ## Schemes
 
