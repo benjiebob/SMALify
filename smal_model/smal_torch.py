@@ -51,7 +51,7 @@ class SMAL(nn.Module):
         # Shape blend shape basis
         
         shapedir = np.reshape(
-            undo_chumpy(dd['shapedirs']), [-1, self.num_betas]).T
+            undo_chumpy(dd['shapedirs']), [-1, self.num_betas]).T.copy()
         self.shapedirs = Variable(
             torch.Tensor(shapedir), requires_grad=False).to(device)
 
