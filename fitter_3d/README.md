@@ -1,4 +1,5 @@
 3D SMAL Fitter
+------
 
 This directory contains code for optimising the SMAL/SMBLD model to provided 3D models.
 
@@ -14,11 +15,11 @@ To avoid errors in initialisation, you may need to manually align your model so 
 
 Two options to run an optimisation:
 
-- Single scheme. Pass args into optimise.py to start a single scheme of optimisation, for example:
+- Single stage. Pass args into optimise.py to start a single scheme of optimisation, for example:
 
 `python fitter_3d/optimise.py --mesh_dir example_meshes --scheme default --lr 1e-3 --nits 100`
 
-- For a more complicated and fine tuned optimisation, add a custom .yaml file. See example_scheme.yaml for how it must be organised. This can then be called in optimise.py using:
+- For a more complicated (eg multi-stage) and fine tuned optimisation, add a custom .yaml file. See example_scheme.yaml for how it must be organised. This can then be called in optimise.py using:
 
 `python fitter_3d/optimise.py --mesh_dir example_meshes --yaml_src fitter_3d/example_scheme.yaml`
 
@@ -31,8 +32,6 @@ Five optimisation schemes (defined in trainer.py/SMALParamGroup):
 - `shape` - `default` without joint rotations
 - `pose` - `default` without shape parameters
 - `deform` - Vertex deformations only
-
-Additional schemes can be custom coded.
 
 
 
