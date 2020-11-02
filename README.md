@@ -151,7 +151,7 @@ if you make use of the limb scaling parameters, or Unity shape prior (on by defa
 Please create a pull request or submit an issue if you would like to contribute.
 
 ## Licensing
-(c) Benjamin Biggs, Andrew Fitzgibbon and Roberto Cipolla. Department of Engineering, University of Cambridge 2020
+(c) Benjamin Biggs, Oliver Boyne, Andrew Fitzgibbon and Roberto Cipolla. Department of Engineering, University of Cambridge 2020
 
 By downloading this code, you agree to the [Creative Commons Attribution 3.0 International license](https://creativecommons.org/licenses/by/3.0/). This license allows users to use, share and adapt the code, so long as credit is given to the authors (e.g. by citation).
 
