@@ -1,5 +1,3 @@
-WARNING: This respository is still in beta and under active development! I am bringing this up to speed in my free moments, but for now, please use at your own risk. If you find there's something not working properly, it's worth doing a quick git pull to see if I've fixed it :)
-
 # SMALify
 
 <img src="docs/badja_result.gif">
