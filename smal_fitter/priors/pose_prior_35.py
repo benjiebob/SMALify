@@ -55,7 +55,7 @@ class Prior(object):
         self.mean_ch = res['mean_pose']
         self.precs_ch = res['pic']
 
-        self.precs = torch.from_numpy(res['pic'].r).float().to(device)
+        self.precs = torch.from_numpy(res['pic'].r.copy()).float().to(device)
         self.mean = torch.from_numpy(res['mean_pose']).float().to(device)
 
         # Mouth closed!

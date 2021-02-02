@@ -27,7 +27,7 @@ class SMAL(nn.Module):
         # -- Load SMPL params --
         # with open(pkl_path, 'r') as f:
         #     dd = pkl.load(f)
-            
+           
         with open(config.SMAL_FILE, 'rb') as f:
             u = pkl._Unpickler(f)
             u.encoding = 'latin1'

@@ -24,7 +24,7 @@ def batch_skew(vec, batch_size=None, opts=None):
                 ],
                 dim=1), [-1])
     out_shape = [batch_size * 9]
-    res = torch.Tensor(np.zeros(out_shape[0])).cuda(device=vec.device)
+    res = torch.Tensor(np.zeros(out_shape[0])).to(device=vec.device)
     res[np.array(indices.flatten())] = updates
     res = torch.reshape(res, [batch_size, 3, 3])
 
@@ -45,7 +45,7 @@ def batch_rodrigues(theta, opts=None):
 
     outer = torch.matmul(r, r.transpose(1,2))
 
-    eyes = torch.eye(3).unsqueeze(0).repeat([batch_size, 1, 1]).cuda(device=theta.device)
+    eyes = torch.eye(3).unsqueeze(0).repeat([batch_size, 1, 1]).to(device=theta.device)
     H = batch_skew(r, batch_size=batch_size, opts=opts)
     R = cos * eyes + (1 - cos) * outer + sin * H 
 

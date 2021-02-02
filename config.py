@@ -1,5 +1,6 @@
 from os.path import join
 import cv2
+import os
 import time
 
 # Define paths to each dataset
@@ -20,7 +21,7 @@ ALLOW_LIMB_SCALING = True # Allow scaling parameters, see Who Left the Dogs Out?
 SHAPE_FAMILY = 1 # Choose from Cat (e.g. House Cat/Tiger/Lion), Canine (e.g. Dog/Wolf), Equine (e.g. Horse/Zebra), Bovine (e.g. Cow), Hippo
 SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
 # SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02099601-golden_retriever/n02099601_176.jpg"
-IMAGE_RANGE = range(0, 10) # Frames to process from sequence. Ignored for stanford extra
+IMAGE_RANGE = range(0, 1) # Frames to process from sequence. Ignored for stanford extra
 WINDOW_SIZE = 10 # Changed number of frames processed in one go.
 
 # Generate video settings
@@ -28,13 +29,28 @@ CHECKPOINT_NAME = "20201001-125009" # the directory to run
 EPOCH_NAME = "st10_ep0" # convention used for the final output file. Don't change this without good reason.
 
 # SMAL
-SMAL_FILE = join(data_path, 'SMALST', 'smpl_models', 'my_smpl_00781_4_all.pkl')
-SMAL_DATA_FILE = join(data_path, 'SMALST', 'smpl_models', 'my_smpl_data_00781_4_all.pkl')
-SMAL_UV_FILE = join(data_path, 'SMALST', 'smpl_models', 'my_smpl_00781_4_all_template_w_tex_uv_001.pkl')
-SMAL_SYM_FILE = join(data_path, 'SMALST', 'smpl_models', 'symIdx.pkl')
+SMAL_MODEL_PATH = join(data_path, 'SMALST', 'smpl_models')
+SMAL_FILE = join(SMAL_MODEL_PATH, 'my_smpl_00781_4_all.pkl')
 
-# PRIORS
-WALKING_PRIOR_FILE = join(data_path, 'priors', 'walking_toy_symmetric_pose_prior_with_cov_35parts.pkl')
+if os.name == 'nt':
+    ## If WINDOWS
+    SMAL_DATA_FILE = join(SMAL_MODEL_PATH, 'my_smpl_data_00781_4_all_WIN.pkl')
+    SMAL_UV_FILE = join(SMAL_MODEL_PATH, 'my_smpl_00781_4_all_template_w_tex_uv_001_WIN.pkl')
+    SMAL_SYM_FILE = join(SMAL_MODEL_PATH, 'symIdx_WIN.pkl')
+
+    if not os.path.exists(SMAL_FILE):
+        print ("Unable to find Windows file. Please run ./utilities/convert_smal_windows.ps1")
+
+    # PRIORS
+    WALKING_PRIOR_FILE = join(data_path, 'priors', 'walking_toy_symmetric_pose_prior_with_cov_35parts_WIN.pkl')
+else:
+    SMAL_DATA_FILE = join(SMAL_MODEL_PATH, 'my_smpl_data_00781_4_all.pkl')
+    SMAL_UV_FILE = join(SMAL_MODEL_PATH, 'my_smpl_00781_4_all_template_w_tex_uv_001.pkl')
+    SMAL_SYM_FILE = join(SMAL_MODEL_PATH, 'symIdx.pkl')
+
+    # PRIORS
+    WALKING_PRIOR_FILE = join(data_path, 'priors', 'walking_toy_symmetric_pose_prior_with_cov_35parts.pkl')
+
 UNITY_SHAPE_PRIOR = join(data_path, 'priors', 'unity_betas.npz')
 
 # DATALOADER
