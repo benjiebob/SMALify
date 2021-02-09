@@ -151,7 +151,7 @@ if you make use of the limb scaling parameters, or Unity shape prior (on by defa
 Please create a pull request or submit an issue if you would like to contribute.
 
 ## Licensing
-(c) Benjamin Biggs, Oliver Boyne Andrew Fitzgibbon and Roberto Cipolla. Department of Engineering, University of Cambridge 2020
+(c) Benjamin Biggs, Oliver Boyne, Andrew Fitzgibbon and Roberto Cipolla. Department of Engineering, University of Cambridge 2020
 
 By downloading this dataset, you agree to the [Creative Commons Attribution-NonCommercial 4.0 International license](https://creativecommons.org/licenses/by-nc-sa/4.0/). This license allows users to use, share and adapt the dataset, so long as credit is given to the authors (e.g. by citation) and the dataset is not used for any commercial purposes.
 
