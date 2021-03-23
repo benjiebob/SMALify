@@ -7,6 +7,7 @@ import time
 data_path = "data"
 BADJA_PATH = "data/BADJA"
 STANFORD_EXTRA_PATH = "data/StanfordExtra"
+CUSTOM_PATH = "data/CUSTOM"
 OUTPUT_DIR = "checkpoints/{0}".format(time.strftime("%Y%m%d-%H%M%S"))
 
 CROP_SIZE = 256 
@@ -19,8 +20,10 @@ ALLOW_LIMB_SCALING = True # Allow scaling parameters, see Who Left the Dogs Out?
 
 # Sequence/Image Settings
 SHAPE_FAMILY = 1 # Choose from Cat (e.g. House Cat/Tiger/Lion), Canine (e.g. Dog/Wolf), Equine (e.g. Horse/Zebra), Bovine (e.g. Cow), Hippo
-SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
+# SEQUENCE_OR_IMAGE_NAME = "badja:rs_dog"
+SEQUENCE_OR_IMAGE_NAME = "custom:IMG_8203"
 # SEQUENCE_OR_IMAGE_NAME = "stanfordextra:n02099601-golden_retriever/n02099601_176.jpg"
+
 IMAGE_RANGE = range(0, 1) # Frames to process from sequence. Ignored for stanford extra
 WINDOW_SIZE = 10 # Changed number of frames processed in one go.
 

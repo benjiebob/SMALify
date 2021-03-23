@@ -68,14 +68,27 @@ def load_badja_sequence(BADJA_PATH, sequence_name, crop_size, image_range = None
     
     return (rgb, sil, joints, visibility), file_names
 
+def load_custom_sequence(CUSTOM_PATH, sequence_name, crop_size):
+    # edit this to the location of the downloaded full dataset .json
+    json_loc = os.path.join(CUSTOM_PATH, f"{sequence_name}.json")
+
+    (rgb, sil, joints, visibility), file_names = load_stanford(CUSTOM_PATH, f"{sequence_name}.jpeg", json_loc, crop_size)
+    mask = visibility < 0.1
+    visibility = visibility * 0.0 + 1.0
+    visibility[mask] = 0.0
+    return (rgb, sil, joints, visibility), file_names
+
 def load_stanford_sequence(STANFORD_EXTRA, image_name, crop_size):
     # edit this to the location of the extracted StanfordDogs tar file (e.g. /.../Images).
-    img_dir = os.path.join(STANFORD_EXTRA, "sample_imgs")
+    image_dir = os.path.join(STANFORD_EXTRA, "sample_imgs")
 
     # edit this to the location of the downloaded full dataset .json
     json_loc = os.path.join(STANFORD_EXTRA, "StanfordExtra_sample.json")
 
-    # load json into memory
+    return load_stanford(image_dir, image_name, json_loc, crop_size)
+
+def load_stanford(img_dir, image_name, json_loc, crop_size):
+     # load json into memory
     with open(json_loc) as infile:
         json_data = json.load(infile)
 
@@ -93,11 +106,11 @@ def load_stanford_sequence(STANFORD_EXTRA, image_name, crop_size):
         decoded = decode_RLE(rle)
         return decoded
 
-    def get_dog(name):
+    def get_dog(img_dir, name):
         data = json_dict[name]
 
         # load img
-        img_data = imageio.imread(os.path.join(img_dir, data['img_path']))
+        img_data = imageio.imread(os.path.join(img_dir, name))
 
         # load seg
         seg_data = get_seg_from_entry(data)
@@ -108,7 +121,7 @@ def load_stanford_sequence(STANFORD_EXTRA, image_name, crop_size):
 
         return data
 
-    loaded_data = get_dog(image_name)
+    loaded_data = get_dog(img_dir, image_name)
 
     # add an extra dummy invisble joint for tail_mid which wasn't annotated in Stanford-Extra
     raw_joints = np.concatenate([
