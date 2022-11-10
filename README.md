@@ -18,12 +18,7 @@ The aim of this repository is to provided demonstrative fitting code to benefit 
     
 2. Install dependencies, particularly [PyTorch (cuda support recommended)](https://pytorch.org/), [Pytorch3D](https://github.com/facebookresearch/pytorch3d). Check [requirements.txt](https://github.com/benjiebob/SMALify/blob/master/requirements.txt) for full details.
 
-3. Download images corresponding to demo BADJA sequence
-   ```
-   cd data/BADJA
-   wget http://mi.eng.cam.ac.uk/~bjb56/datasets/badja_extra_videos.zip
-   unzip badja_extra_videos.zip
-   ```
+3. Download [images](https://drive.google.com/file/d/1ad1BLmzyOp_g3BfpE2yklNI-E1b8y4gy/view?usp=sharing) corresponding to demo BADJA sequence.
 
 4. Inspect the directory paths in [config.py](https://github.com/benjiebob/SMALify/blob/master/config.py) and make sure they match your system.
 
